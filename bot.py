@@ -233,13 +233,13 @@ def add_to_pokedex(user_id, pokemon_name):
 @app.on_message(filters.command("leaderboard"))
 def show_leaderboard(client, message):
     leaderboard = get_leaderboard()
-    leaderboard_text = "**leaderboard:**\n\n"
+    leaderboard_text = "**Leaderboard:**\n\n"
     rank = 1
     for user_data in leaderboard:
         user_id = user_data["user_id"]
         username = client.get_chat(user_id).username if client.get_chat(user_id).username else client.get_chat(user_id).first_name
         pokemon_count = user_data["pokedex_count"]
-        leaderboard_text += "{}. {} - {} Pokémon\n".format(rank, username, pokemon_count)
+        leaderboard_text = "{}. {} - {} Pokémon\n".format(rank, username, pokemon_count)
         rank += 1
     client.send_message(chat_id=message.chat.id, text=leaderboard_text)
 
