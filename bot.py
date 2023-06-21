@@ -166,7 +166,7 @@ def view_pokedex(client, message):
         pokedex_list = '\n'.join(pokedex_data['pokedex']) if pokedex_data['pokedex'] else 'Your Pokedex is empty.'
     else:
         pokedex_list = 'Your Pokedex is empty.'
-    client.send_message(message.chat.id, "Your Pokedex:\n{}".format(pokedex_list))
+    client.send_message(message.chat.id, "**{user_id} Your Pokedex:**\n{}".format(pokedex_list))
 
 # Handler function for /catch command
 @app.on_message(filters.command("catch"))
@@ -229,10 +229,10 @@ def leaderboard(client, message):
     top_users = collection.aggregate([
         {"$project": {"user_id": 1, "pokedex_count": {"$size": {"$ifNull": ["$pokedex", []]}}}},
         {"$sort": {"pokedex_count": -1}},
-        {"$limit": 10}
+        {"$limit": 3}
     ])
 
-    leaderboard_text = "Leaderboard - Top 10 Users:\n"
+    leaderboard_text = "Leaderboard - Top 3 Users:\n"
     for idx, user in enumerate(top_users):
         user_rank = idx + 1
         user_id = user["user_id"]
