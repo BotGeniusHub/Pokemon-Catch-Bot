@@ -139,7 +139,6 @@ pokemon_database = [
     {"name": "Weezing", "catch_rate": 0.5},
     {"name": "Rhyhorn", "catch_rate": 0.6},
     {"name": "Rhydon", "catch_rate": 0.4}, 
-    {"name": "Mew", "catch_rate": 0.3},
     {"name": "Entei", "catch_rate": 0.3},
     {"name": "Suicune", "catch_rate": 0.3},
 
