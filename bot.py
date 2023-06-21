@@ -154,7 +154,7 @@ def group_message(update, context):
 
     message_count += 1
 
-    if message_count % 100 == 0:
+    if message_count % 10 == 0:
 
         announced_pokemon = random.choice(pokemon_database)
 
