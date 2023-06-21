@@ -239,7 +239,7 @@ def show_leaderboard(client, message):
         user_id = user_data["user_id"]
         username = client.get_chat(user_id).username if client.get_chat(user_id).username else client.get_chat(user_id).first_name
         pokemon_count = user_data["pokedex_count"]
-        leaderboard_text = "{}. {} - {} Pokémon\n".format(rank, username, pokemon_count)
+        leaderboard_text += "{}. {} - {} Pokémon\n".format(rank, username, pokemon_count)
         rank += 1
     client.send_message(chat_id=message.chat.id, text=leaderboard_text)
 
