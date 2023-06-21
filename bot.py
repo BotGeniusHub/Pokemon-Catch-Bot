@@ -166,7 +166,7 @@ def start(_, message):
         with open("pokemon_image.jpg", "wb") as file:
             file.write(response.content)
 
-    caption = f"You encountered a wild {pokemon_name}!\nUse /catch to catch it!"
+    caption = f"You encountered a wild {pokemon_name}!\n\nUse /help for help menu!"
 
     app.send_photo(
         chat_id=message.chat.id,
@@ -180,9 +180,10 @@ def help_command(_, message):
                 "Commands:\n" \
                 "/start - Start the bot and encounter a wild Pokémon\n" \
                 "/catch - Attempt to catch the encountered Pokémon\n" \
-                "/help - Display this help menu"
+                "/help - Display this help menu\n" \
+                "/pokedex - To view your pokémon"
 
-    bot.send_message(chat_id=message.chat.id, text=help_text)
+    app.send_message(chat_id=message.chat.id, text=help_text)
 
 
 # Handler function for /pokedex command
