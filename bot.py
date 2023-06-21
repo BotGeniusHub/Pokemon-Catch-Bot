@@ -758,7 +758,7 @@ def catch_pokemon(client, message):
 
     # Check if a Pokémon is currently announced
     if announced_pokemon is None:
-        message.reply_text(chat_id=message.chat.id, text="No Pokémon is currently announced.")
+        client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.")
         return
 
     # Check if the caught Pokémon matches the announced Pokémon
@@ -766,13 +766,13 @@ def catch_pokemon(client, message):
 
         # Check if the Pokémon has already been caught
         if announced_pokemon["name"] in caught_pokemon:
-            message.reply_text(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]))
+            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]))
             return
 
         catch_probability = random.random()
 
         if catch_probability <= announced_pokemon["catch_rate"]:
-            message.reply_text(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(message.from_user.username, announced_pokemon["name"]))
+            client.send_message(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(message.from_user.username, announced_pokemon["name"]))
             add_to_pokedex(user_id, announced_pokemon["name"])
 
             # Add the caught Pokémon and the user who caught it to the dictionary
@@ -781,9 +781,9 @@ def catch_pokemon(client, message):
             # Set announced_pokemon to None to allow the announcement of a new Pokémon
             announced_pokemon = None
         else:
-            message.reply_text(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
+            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
     else:
-        message.reply_text(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name))
+        client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name))
 
 
 # Handler function for group messages
