@@ -168,7 +168,7 @@ def start(_, message):
 
     caption = f"You encountered a wild {pokemon_name}!\nUse /catch to catch it!"
 
-    bot.send_photo(
+    app.send_photo(
         chat_id=message.chat.id,
         photo="https://graph.org/file/58ca90f1f28d86419205e.jpg",
         caption=caption
