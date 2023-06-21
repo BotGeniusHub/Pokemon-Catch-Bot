@@ -100,6 +100,25 @@ def add_to_pokedex(user_id, pokemon_name):
     else:
         collection.insert_one({"user_id": user_id, "pokedex": [pokemon_name]})
 
+# Handler function for /leaderboard command
+@app.on_message(filters.command("leaderboard"))
+def leaderboard(client, message):
+    top_users = collection.aggregate([
+        {"$project": {"user_id": 1, "pokedex_count": {"$size": "$pokedex"}}},
+        {"$sort": {"pokedex_count": -1}},
+        {"$limit": 10}
+    ])
+    
+    leaderboard_text = "Leaderboard - Top 10 Users:\n"
+    for idx, user in enumerate(top_users):
+        user_rank = idx + 1
+        user_id = user["user_id"]
+        pokedex_count = user["pokedex_count"]
+        leaderboard_text += f"{user_rank}. User ID: {user_id}, Pokedex Count: {pokedex_count}\n"
+    
+    client.send_message(message.chat.id, leaderboard_text)
+
+
 # Start the bot
 app.run()
 idle() 
