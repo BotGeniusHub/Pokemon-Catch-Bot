@@ -758,7 +758,7 @@ def catch_pokemon(client, message):
 
     # Check if a Pokémon is currently announced
     if announced_pokemon is None:
-        client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.")
+        client.reply_text(chat_id=message.chat.id, text="No Pokémon is currently announced.")
         return
 
     # Check if the caught Pokémon matches the announced Pokémon
