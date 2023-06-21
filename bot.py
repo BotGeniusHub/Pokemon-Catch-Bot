@@ -163,10 +163,14 @@ def view_pokedex(client, message):
     user_id = message.from_user.id
     pokedex_data = collection.find_one({"user_id": user_id})
     if pokedex_data:
-        pokedex_list = '\n'.join(pokedex_data['pokedex']) if pokedex_data['pokedex'] else 'Your Pokedex is empty.'
+        pokedex_list = ""
+        for i, pokemon_name in enumerate(pokedex_data['pokedex'], start=1):
+            pokedex_list += "{}. {}\n".format(i, pokemon_name)
+        pokemon_count = len(pokedex_data['pokedex'])
+        client.send_message(message.chat.id, "**Your Pokedex:**\n{}\n**Total Pokémon Caught:** {}".format(pokedex_list, pokemon_count))
     else:
-        pokedex_list = 'Your Pokedex is empty.'
-    client.send_message(message.chat.id, "**Your Pokedex:**\n\n{}".format(pokedex_list))
+        client.send_message(message.chat.id, "Your Pokedex is empty.")
+
 
 # Handler function for /catch command
 @app.on_message(filters.command("catch"))
