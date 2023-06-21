@@ -154,7 +154,7 @@ api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
 bot_token = '6206599982:AAHJlIHxPWqMTpRP4iMvGb0I0pcOf_o-nG8'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
-@bot.on_message(filters.command("start"))
+@app.on_message(filters.command("start"))
 def start(_, message):
     # Send an image with a caption
     pokemon_name = random.choice(pokemon_database)["name"]
@@ -174,7 +174,7 @@ def start(_, message):
         caption=caption
     )
 
-@bot.on_message(filters.command("help"))
+@app.on_message(filters.command("help"))
 def help_command(_, message):
     help_text = "Welcome to the Pokémon Catching Bot!\n\n" \
                 "Commands:\n" \
