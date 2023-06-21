@@ -766,13 +766,13 @@ def catch_pokemon(client, message):
 
         # Check if the Pokémon has already been caught
         if announced_pokemon["name"] in caught_pokemon:
-            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]))
+            client.reply_text(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]))
             return
 
         catch_probability = random.random()
 
         if catch_probability <= announced_pokemon["catch_rate"]:
-            client.send_message(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(announced_pokemon["name"]))
+            client.reply_text(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(announced_pokemon["name"]))
             add_to_pokedex(user_id, announced_pokemon["name"])
 
             # Add the caught Pokémon and the user who caught it to the dictionary
@@ -781,9 +781,9 @@ def catch_pokemon(client, message):
             # Set announced_pokemon to None to allow the announcement of a new Pokémon
             announced_pokemon = None
         else:
-            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
+            client.reply_text((chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"])))))
     else:
-        client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name))
+        client.reply_text(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name))
 
 
 # Handler function for group messages
