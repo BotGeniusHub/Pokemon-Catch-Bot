@@ -154,10 +154,25 @@ api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
 bot_token = '6206599982:AAHJlIHxPWqMTpRP4iMvGb0I0pcOf_o-nG8'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
-# Handler function for /start or /help command
-@app.on_message(filters.command(["start", "help"]))
-def start_help(client, message):
-    client.send_message(message.chat.id, "Bot is running. Use /help to get a list of commands.")
+@bot.on_message(filters.command("start"))
+def start(_, message):
+    # Send an image with a caption
+    pokemon_name = random.choice(pokemon_database)["name"]
+    pokemon_info = pokemon(pokemon_name.lower())
+
+    image_url = pokemon_info.sprites.front_default
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        with open("pokemon_image.jpg", "wb") as file:
+            file.write(response.content)
+
+    caption = f"You encountered a wild {pokemon_name}!\nUse /catch to catch it!"
+
+    bot.send_photo(
+        chat_id=message.chat.id,
+        photo="pokemon_image.jpg",
+        caption=caption
+    )
 
 # Handler function for /pokedex command
 @app.on_message(filters.command("pokedex"))
