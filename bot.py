@@ -174,6 +174,17 @@ def start(_, message):
         caption=caption
     )
 
+@bot.on_message(filters.command("help"))
+def help_command(_, message):
+    help_text = "Welcome to the Pokémon Catching Bot!\n\n" \
+                "Commands:\n" \
+                "/start - Start the bot and encounter a wild Pokémon\n" \
+                "/catch - Attempt to catch the encountered Pokémon\n" \
+                "/help - Display this help menu"
+
+    bot.send_message(chat_id=message.chat.id, text=help_text)
+
+
 # Handler function for /pokedex command
 @app.on_message(filters.command("pokedex"))
 def view_pokedex(client, message):
@@ -244,51 +255,6 @@ def add_to_pokedex(user_id, pokemon_name):
     else:
         collection.insert_one({"user_id": user_id, "pokedex": [pokemon_name]})
 
-# Handler function for /leaderboard command
-@app.on_message(filters.command("leaderboard"))
-def get_leaderboard(client, message):
-    leaderboard = get_leaderboard()
-    leaderboard_text = "**Leaderboard:**\n\n"
-    rank = 1
-    for user_data in leaderboard:
-        user_id = user_data["user_id"]
-        username = client.get_chat(user_id).username if client.get_chat(user_id).username else client.get_chat(user_id).first_name
-        pokemon_count = user_data["pokedex_count"]
-        leaderboard_text += "{}. {} - {} Pokémon\n".format(rank, username, pokemon_count)
-        rank += 1
-    client.send_message(chat_id=message.chat.id, text=leaderboard_text)
-
-# Command handler for /pokemon command
-@app.on_message(filters.command("pokemon"))
-def pokemon_command(client, message):
-    # Extract the Pokemon name from the command
-    command_parts = message.command
-    if len(command_parts) < 2:
-        message.reply_text("Please provide a Pokemon name.")
-        return
-    pokemon_name = command_parts[1].lower()
-
-    # Query the database for the Pokemon information
-    result = collection.find_one({"name": pokemon_name})
-    if result:
-        message.reply_text(f"Name: {result['name']}\nType: {result['type']}\nHeight: {result['height']}\nWeight: {result['weight']}")
-    else:
-        # If the Pokemon is not found in the database, query the PokeAPI
-        try:
-            response = pokemon(pokemon_name)
-            height = response.height / 10  # Convert height from decimeters to meters
-            weight = response.weight / 10  # Convert weight from hectograms to kilograms
-            types = [t.type.name for t in response.types]
-            message.reply_text(f"Name: {response.name}\nType: {', '.join(types)}\nHeight: {height} m\nWeight: {weight} kg")
-            # Save the Pokemon information to the database
-            collection.insert_one({
-                "name": response.name,
-                "type": types,
-                "height": height,
-                "weight": weight
-            })
-        except requests.exceptions.HTTPError:
-            message.reply_text("Pokemon not found.")
             
 # Start the bot
 app.run()
