@@ -170,7 +170,7 @@ def start(_, message):
 
     bot.send_photo(
         chat_id=message.chat.id,
-        photo="pokemon_image.jpg",
+        photo="https://graph.org/file/58ca90f1f28d86419205e.jpg",
         caption=caption
     )
 
