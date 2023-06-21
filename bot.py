@@ -243,53 +243,38 @@ def show_leaderboard(client, message):
         rank += 1
     client.send_message(chat_id=message.chat.id, text=leaderboard_text)
 
-# Handler function for /pgift command
-@app.on_message(filters.command("pgift"))
-def gift_pokemon(client, message):
-    user_input = message.text
-    pokemon_name = user_input.split("/pgift ", 1)[-1].lower()
-    sender_id = message.from_user.id
-
-    # Check if the Pokémon exists in the database
-    pokemon_data = next((p for p in pokemon_database if p["name"].lower() == pokemon_name), None)
-    if pokemon_data is None:
-        client.send_message(chat_id=message.chat.id, text="The specified Pokémon does not exist.")
+# Command handler for /pokemon command
+@app.on_message(filters.command("pokemon"))
+def pokemon_command(client, message):
+    # Extract the Pokemon name from the command
+    command_parts = message.command
+    if len(command_parts) < 2:
+        message.reply_text("Please provide a Pokemon name.")
         return
+    pokemon_name = command_parts[1].lower()
 
-    # Check if the sender has the Pokémon in their Pokedex
-    sender_pokedex_data = collection.find_one({"user_id": sender_id})
-    if sender_pokedex_data is None or pokemon_name not in sender_pokedex_data['pokedex']:
-        client.send_message(chat_id=message.chat.id, text="You don't have {} in your Pokedex.".format(pokemon_name))
-        return
-
-    # Retrieve the target user ID from the message
-    target_username = user_input.split(" ", 2)[-1]
-    target_user = client.get_users(target_username)
-    if not target_user:
-        client.send_message(chat_id=message.chat.id, text="The specified user does not exist.")
-        return
-
-    target_user_id = target_user[0].id
-
-    # Check if the target user exists in the database
-    target_pokedex_data = collection.find_one({"user_id": target_user_id})
-    if target_pokedex_data is None:
-        target_pokedex_data = {"user_id": target_user_id, "pokedex": []}
-        collection.insert_one(target_pokedex_data)
-
-    # Remove the Pokémon from the sender's Pokedex
-    sender_pokedex_data['pokedex'].remove(pokemon_name)
-    collection.update_one({"user_id": sender_id}, {"$set": sender_pokedex_data})
-
-    # Add the Pokémon to the target user's Pokedex
-    target_pokedex_data['pokedex'].append(pokemon_name)
-    collection.update_one({"user_id": target_user_id}, {"$set": target_pokedex_data})
-
-    # Send confirmation messages to the sender and the target user
-    client.send_message(chat_id=message.chat.id, text="You have gifted {} to @{}!".format(pokemon_name, target_user[0].username))
-    client.send_message(chat_id=target_user_id, text="You have received {} from @{}!".format(pokemon_name, message.from_user.username))
-
-
+    # Query the database for the Pokemon information
+    result = collection.find_one({"name": pokemon_name})
+    if result:
+        message.reply_text(f"Name: {result['name']}\nType: {result['type']}\nHeight: {result['height']}\nWeight: {result['weight']}")
+    else:
+        # If the Pokemon is not found in the database, query the PokeAPI
+        try:
+            response = pokemon(pokemon_name)
+            height = response.height / 10  # Convert height from decimeters to meters
+            weight = response.weight / 10  # Convert weight from hectograms to kilograms
+            types = [t.type.name for t in response.types]
+            message.reply_text(f"Name: {response.name}\nType: {', '.join(types)}\nHeight: {height} m\nWeight: {weight} kg")
+            # Save the Pokemon information to the database
+            collection.insert_one({
+                "name": response.name,
+                "type": types,
+                "height": height,
+                "weight": weight
+            })
+        except requests.exceptions.HTTPError:
+            message.reply_text("Pokemon not found.")
+            
 # Start the bot
 app.run()
 idle()
