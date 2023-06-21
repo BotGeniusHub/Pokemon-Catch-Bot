@@ -10,7 +10,7 @@ client = MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?
 db = client['pokemon_bot']
 collection = db['pokedex']
 
-# Database of available Pokémon
+# Database of available Pokémon, you can add more Pokemon with this format
 pokemon_database = [
     {"name": "Pikachu", "catch_rate": 0.5},
     {"name": "Charizard", "catch_rate": 0.3},
