@@ -166,7 +166,7 @@ def view_pokedex(client, message):
         pokedex_list = '\n'.join(pokedex_data['pokedex']) if pokedex_data['pokedex'] else 'Your Pokedex is empty.'
     else:
         pokedex_list = 'Your Pokedex is empty.'
-    client.send_message(message.chat.id, "**{user_id} Your Pokedex:**\n\n{}".format(pokedex_list))
+    client.send_message(message.chat.id, "**Your Pokedex:**\n\n{}".format(pokedex_list))
 
 # Handler function for /catch command
 @app.on_message(filters.command("catch"))
