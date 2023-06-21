@@ -53,7 +53,7 @@ def catch_pokemon(client, message):
     if announced_pokemon is None:
         client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.")
         return
-    if pokemon_name == announced_pokemon["name"].lower():
+    if pokemon_name.lower() == announced_pokemon["name"].lower():
         catch_probability = random.random()
         if catch_probability <= announced_pokemon["catch_rate"]:
             client.send_message(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(announced_pokemon["name"]))
