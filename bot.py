@@ -47,21 +47,21 @@ def view_pokedex(client, message):
 
 # Handler function for /catch command
 @app.on_message(filters.command("catch"))
-def catch_pokemon(update, context):
-    user_input = update.message.text
+def catch_pokemon(client, message):
+    user_input = message.text
     pokemon_name = user_input.split("/catch ", 1)[-1].lower()
     if announced_pokemon is None:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="No Pokémon is currently announced.")
+        client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.")
         return
     if pokemon_name == announced_pokemon["name"].lower():
         catch_probability = random.random()
         if catch_probability <= announced_pokemon["catch_rate"]:
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Congratulations! You caught {}!".format(announced_pokemon["name"]))
-            add_to_pokedex(update.message.from_user.id, announced_pokemon["name"])
+            client.send_message(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(announced_pokemon["name"]))
+            add_to_pokedex(message.from_user.id, announced_pokemon["name"])
         else:
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
+            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
     else:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="The announced Pokémon is not {}.".format(pokemon_name))
+        client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name))
 
 
 # Handler function for group messages
