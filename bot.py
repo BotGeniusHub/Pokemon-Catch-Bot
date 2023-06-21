@@ -2,6 +2,7 @@ import random
 import requests
 from pymongo import MongoClient
 from pyrogram import Client, filters, idle
+from pokebase import pokemon
 
 # Connect to MongoDB
 client = MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
