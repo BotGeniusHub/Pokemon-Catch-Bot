@@ -743,15 +743,15 @@ def view_pokedex(client, message):
         client.send_message(message.chat.id, "Your Pokedex is empty.")
 
 
-# Global variable to track the announced Pokémon
+# Global variables to track the announced Pokémon and caught Pokémon
 announced_pokemon = None
-
-# Dictionary to track the caught Pokémon and the user who caught them
 caught_pokemon = {}
 
 # Handler function for /catch command
 @app.on_message(filters.command("catch"))
 def catch_pokemon(client, message):
+    global announced_pokemon  # Declare announced_pokemon as a global variable
+    user_id = message.from_user.id
     user_input = message.text
     pokemon_name = user_input.split("/catch ", 1)[-1].lower()
 
