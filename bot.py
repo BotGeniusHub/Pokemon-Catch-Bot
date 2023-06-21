@@ -728,34 +728,6 @@ def help_command(_, message):
 
     app.send_message(chat_id=message.chat.id, text=help_text)
 
-# Handler function for inline queries
-@app.on_inline_query()
-def inline_query_handler(client, query):
-    user_input = query.query.strip().lower()
-
-    # Filter the Pokémon database based on the user input
-    results = [
-        {
-            "type": "article",
-            "id": str(uuid4()),
-            "title": pokemon["name"],
-            "description": f"Type: {pokemon['type']}, Catch Rate: {pokemon['catch_rate']}",
-            "thumb_url": pokemon["image_url"],
-            "input_message_content": {
-                "message_text": f"Name: {pokemon['name']}\nType: {pokemon['type']}\nCatch Rate: {pokemon['catch_rate']}",
-                "parse_mode": "Markdown"
-            }
-        }
-        for pokemon in pokemon_database
-        if user_input in pokemon["name"].lower()
-    ]
-
-    # Answer the inline query with the results
-    client.answer_inline_query(query.id, results=results, cache_time=1)
-
-
-
-
                   
 # Handler function for /pokedex command
 @app.on_message(filters.command("pokedex"))
