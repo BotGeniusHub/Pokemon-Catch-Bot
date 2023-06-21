@@ -24,7 +24,7 @@ pokemon_database = [
     {"name": "Blastoise", "catch_rate": 45},
     {"name": "Caterpie", "catch_rate": 255},
     {"name": "Metapod", "catch_rate": 120},
-    {"name": "Butterfree", "catch_rate": 45}
+    {"name": "Butterfree", "catch_rate": 45}, 
     {"name": "Weedle", "catch_rate": 255},
     {"name": "Kakuna", "catch_rate": 120},
     {"name": "Beedrill", "catch_rate": 45},
