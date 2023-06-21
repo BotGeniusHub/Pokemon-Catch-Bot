@@ -740,7 +740,7 @@ def view_pokedex(client, message):
         pokemon_count = len(pokedex_data['pokedex'])
         client.send_message(message.chat.id, "**Your Pokedex:**\n{}\n**Total Pokémon Caught:** {}".format(pokedex_list, pokemon_count, reply_to_message_id=message.message_id))
     else:
-        client.send_message(message.chat.id, "Your Pokedex is empty.")
+        client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
 
 
 # Global variables to track the announced Pokémon and caught Pokémon
