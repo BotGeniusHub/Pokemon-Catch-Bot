@@ -743,20 +743,43 @@ def view_pokedex(client, message):
         client.send_message(message.chat.id, "Your Pokedex is empty.")
 
 
+# Global variable to track the announced Pokémon
+announced_pokemon = None
+
+# Dictionary to track the caught Pokémon and the user who caught them
+caught_pokemon = {}
+
 # Handler function for /catch command
 @app.on_message(filters.command("catch"))
 def catch_pokemon(client, message):
     user_id = message.from_user.id
     user_input = message.text
     pokemon_name = user_input.split("/catch ", 1)[-1].lower()
+
+    # Check if a Pokémon is currently announced
     if announced_pokemon is None:
         client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.")
         return
+
+    # Check if the caught Pokémon matches the announced Pokémon
     if pokemon_name.lower() == announced_pokemon["name"].lower():
+
+        # Check if the Pokémon has already been caught
+        if announced_pokemon["name"] in caught_pokemon:
+            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]))
+            return
+
         catch_probability = random.random()
+
         if catch_probability <= announced_pokemon["catch_rate"]:
             client.send_message(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(announced_pokemon["name"]))
-            add_to_pokedex(message.from_user.id, announced_pokemon["name"])
+            add_to_pokedex(user_id, announced_pokemon["name"])
+
+            # Add the caught Pokémon and the user who caught it to the dictionary
+            caught_pokemon[announced_pokemon["name"]] = user_id
+
+            # Set announced_pokemon to None to allow the announcement of a new Pokémon
+            announced_pokemon = None
         else:
             client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
     else:
