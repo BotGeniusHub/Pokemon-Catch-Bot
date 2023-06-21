@@ -225,21 +225,17 @@ def add_to_pokedex(user_id, pokemon_name):
 
 # Handler function for /leaderboard command
 @app.on_message(filters.command("leaderboard"))
-def leaderboard(client, message):
-    top_users = collection.aggregate([
-        {"$project": {"user_id": 1, "pokedex_count": {"$size": {"$ifNull": ["$pokedex", []]}}}},
-        {"$sort": {"pokedex_count": -1}},
-        {"$limit": 3}
-    ])
-
-    leaderboard_text = "Leaderboard - Top 3 Users:\n"
-    for idx, user in enumerate(top_users):
-        user_rank = idx + 1
-        user_id = user["user_id"]
-        pokedex_count = user["pokedex_count"]
-        leaderboard_text += f"{user_rank}. User ID: {user_id}, Pokedex Count: {pokedex_count}\n"
-
-    client.send_message(message.chat.id, leaderboard_text)
+def show_leaderboard(client, message):
+    leaderboard = get_leaderboard()
+    leaderboard_text = "**Leaderboard:**\n\n"
+    rank = 1
+    for user_data in leaderboard:
+        user_id = user_data["user_id"]
+        username = client.get_chat(user_id).username if client.get_chat(user_id).username else client.get_chat(user_id).first_name
+        pokemon_count = user_data["pokedex_count"]
+        leaderboard_text += "{}. {} - {} Pokémon\n".format(rank, username, pokemon_count)
+        rank += 1
+    client.send_message(chat_id=message.chat.id, text=leaderboard_text)
 
 # Start the bot
 app.run()
