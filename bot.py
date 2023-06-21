@@ -746,6 +746,7 @@ def view_pokedex(client, message):
 # Handler function for /catch command
 @app.on_message(filters.command("catch"))
 def catch_pokemon(client, message):
+    user_id = message.from_user.id
     user_input = message.text
     pokemon_name = user_input.split("/catch ", 1)[-1].lower()
     if announced_pokemon is None:
