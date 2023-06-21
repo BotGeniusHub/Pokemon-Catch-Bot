@@ -722,12 +722,7 @@ def help_command(client, message):
     
     image_path = "https://telegra.ph/file/c858bf6f6e617b59c986a.jpg"  
     with open(image_path, "rb") as image_file:
-        caption = "Welcome to the Pokémon Catching Bot!\n\n", 
-                  "Commands:\n", 
-                  "/start - Start the bot and encounter a wild Pokémon\n", 
-                  "/catch - Attempt to catch the encountered Pokémon\n", 
-                  "/help - Display this help menu\n", 
-                  "/pokedex - View your Pokémon"
+        caption = "Welcome to the Pokémon Catching Bot!\n\n", "Commands👇🏻\n", "/start - Start the bot and encounter a wild Pokémon\n", "/catch - Attempt to catch the encountered Pokémon\n", "/help - Display this help menu\n", "/pokedex - View your Pokémon"
                        
         client.send_photo(chat_id=message.chat.id, photo=image_file, caption=caption, reply_to_message_id=message.message_id)
 
