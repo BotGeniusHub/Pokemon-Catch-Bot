@@ -266,11 +266,11 @@ def gift_pokemon(client, message):
     # Retrieve the target user ID from the message
     target_username = user_input.split(" ", 2)[-1]
     target_user = client.get_users(target_username)
-    if target_user is None:
+    if not target_user:
         client.send_message(chat_id=message.chat.id, text="The specified user does not exist.")
         return
 
-    target_user_id = target_user.id
+    target_user_id = target_user[0].id
 
     # Check if the target user exists in the database
     target_pokedex_data = collection.find_one({"user_id": target_user_id})
@@ -287,8 +287,8 @@ def gift_pokemon(client, message):
     collection.update_one({"user_id": target_user_id}, {"$set": target_pokedex_data})
 
     # Send confirmation messages to the sender and the target user
-    client.send_message(chat_id=message.chat.id, text="You have gifted {} to {}!".format(pokemon_name, target_user.username))
-    client.send_message(chat_id=target_user_id, text="You have received {} from {}!".format(pokemon_name, message.from_user.username))
+    client.send_message(chat_id=message.chat.id, text="You have gifted {} to @{}!".format(pokemon_name, target_user[0].username))
+    client.send_message(chat_id=target_user_id, text="You have received {} from @{}!".format(pokemon_name, message.from_user.username))
 
 
 # Start the bot
