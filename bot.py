@@ -715,6 +715,7 @@ def start(_, message):
         chat_id=message.chat.id,
         photo="https://graph.org/file/58ca90f1f28d86419205e.jpg",
         caption=caption
+        reply_to_message_id=message.message_id
     )
 
 @app.on_message(filters.command("help"))
