@@ -781,7 +781,7 @@ def catch_pokemon(client, message):
             # Set announced_pokemon to None to allow the announcement of a new Pokémon
             announced_pokemon = None
         else:
-            client.reply_text((chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
+            client.reply_text(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]))
     else:
         client.reply_text(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name))
 
