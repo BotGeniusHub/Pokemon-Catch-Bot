@@ -772,7 +772,7 @@ def catch_pokemon(client, message):
         catch_probability = random.random()
 
         if catch_probability <= announced_pokemon["catch_rate"]:
-            client.send_message(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(message.from_user.username, announced_pokemon["name"]))
+            client.send_message(chat_id=message.chat.id, text="Congratulations! You caught {}!".format(announced_pokemon["name"]))
             add_to_pokedex(user_id, announced_pokemon["name"])
 
             # Add the caught Pokémon and the user who caught it to the dictionary
