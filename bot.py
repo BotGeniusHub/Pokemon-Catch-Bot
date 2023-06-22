@@ -7,7 +7,7 @@ from pokebase import pokemon
 from uuid import uuid4
 
 # Connect to MongoDB
-client = MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
+client = MongoClient('mongodb+srv://jarvis:op@cluster0.7tisvwv.mongodb.net/?retryWrites=true&w=majority')
 db = client['pokemon_bot']
 collection = db['pokedex']
 
