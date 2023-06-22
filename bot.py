@@ -742,6 +742,31 @@ def view_pokedex(client, message):
     else:
         client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
 
+# Handler function for /topcatcher command
+@app.on_message(filters.command("topcatcher"))
+def top_catcher_command(client, message):
+    top_catchers = collection.aggregate([
+        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 5}
+    ])
+    
+    top_catchers = list(top_catchers)  # Convert the result to a list
+    
+    if not top_catchers:
+        client.send_message(chat_id=message.chat.id, text="No Pokemon catchers found.", reply_to_message_id=message.message_id)
+        return
+    
+    top_catcher_text = "Top 5 Pokemon Catchers:\n"
+    for i, catcher in enumerate(top_catchers, start=1):
+        user_id = catcher["_id"]
+        user_name = get_user_name(user_id)  # Replace with your method to get the user's name
+        catch_count = catcher["count"]
+        top_catcher_text += f"{i}. {user_name} - {catch_count} Pokemon\n"
+
+    client.send_message(chat_id=message.chat.id, text=top_catcher_text, reply_to_message_id=message.message_id)
+
+
 
 # Global variables to track the announced Pokémon and caught Pokémon
 announced_pokemon = None
