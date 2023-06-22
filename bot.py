@@ -771,7 +771,9 @@ def top_catcher_command(client, message):
         user_data = collection.find_one({"user_id": user_id})
         username = user_data["username"] if user_data and "username" in user_data else "Unknown"
         pokemon_count = catcher["count"]
-        top_catcher_text += f"{i}. [{username}](tg://user?id={user_id}) - {pokemon_count} Pokemon\n"
+        caught_pokemon = catcher["caught_pokemon"] if "caught_pokemon" in catcher else []
+        pokemon_list = ", ".join(caught_pokemon)
+        top_catcher_text += f"{i}. [{username}](tg://user?id={user_id}) - {pokemon_count} Pokemon: {pokemon_list}\n"
 
     client.send_message(chat_id=message.chat.id, text=top_catcher_text, parse_mode="Markdown", reply_to_message_id=message.message_id)
 
