@@ -727,7 +727,95 @@ def help_command(client, message):
                        
         client.send_photo(chat_id=message.chat.id, photo=image_file, caption=caption, reply_to_message_id=message.message_id)
 
-                  
+
+#-----------------------
+
+# Handler function for /fight command
+@app.on_message(filters.command("fight"))
+def fight_command(client, message):
+    # Get the user's ID
+    user_id = message.from_user.id
+    
+    # Get the user's Pokedex data
+    pokedex_data = collection.find_one({"user_id": user_id})
+    
+    # Check if the user has any Pokémon in their Pokedex
+    if pokedex_data and pokedex_data["pokedex"]:
+        # Select two random Pokémon from the user's Pokedex
+        pokemon_list = pokedex_data["pokedex"]
+        pokemon1 = random.choice(pokemon_list)
+        pokemon2 = random.choice(pokemon_list)
+
+        # Simulate the battle between the two Pokémon
+        winner = simulate_battle(pokemon1, pokemon2)
+
+        # Send the battle result as a message
+        if winner:
+            result = f"The winner is {winner}!"
+        else:
+            result = "It's a tie!"
+        client.send_message(chat_id=message.chat.id, text=result, reply_to_message_id=message.message_id)
+    else:
+        # Inform the user that they don't have any Pokémon in their Pokedex
+        client.send_message(chat_id=message.chat.id, text="You don't have any Pokémon in your Pokedex.", reply_to_message_id=message.message_id)
+
+# Function to simulate a battle between two Pokémon
+def simulate_battle(pokemon1, pokemon2):
+    # Get the stats of the two Pokémon from the PokeAPI or your desired source
+    pokemon1_stats = get_pokemon_stats(pokemon1)
+    pokemon2_stats = get_pokemon_stats(pokemon2)
+    
+    # Calculate the total stats of each Pokémon
+    pokemon1_total_stats = sum(pokemon1_stats.values())
+    pokemon2_total_stats = sum(pokemon2_stats.values())
+
+    # Compare the total stats to determine the winner
+    if pokemon1_total_stats > pokemon2_total_stats:
+        return pokemon1
+    elif pokemon2_total_stats > pokemon1_total_stats:
+        return pokemon2
+    else:
+        return None
+
+# Function to get the stats of a Pokémon from the PokeAPI
+def get_pokemon_stats(pokemon):
+    # API endpoint for retrieving a Pokémon's information
+    url = f"https://pokeapi.co/api/v2/pokemon/{pokemon}"
+    
+    try:
+        # Send a GET request to the PokeAPI endpoint
+        response = requests.get(url)
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            pokemon_data = response.json()
+            
+            # Extract the base stats of the Pokémon
+            stats = pokemon_data["stats"]
+            
+            # Create a dictionary to store the stats
+            stats_dict = {}
+           
+            # Iterate over the stats and extract the stat name and value
+            for stat in stats:
+                stat_name = stat["stat"]["name"]
+                stat_value = stat["base_stat"]
+                
+                # Add the stat to the dictionary
+                stats_dict[stat_name] = stat_value
+            
+            return stats_dict
+        else:
+            # Handle the case when the request fails
+            print(f"Failed to retrieve stats for {pokemon}. Error code: {response.status_code}")
+    
+    except requests.exceptions.RequestException as e:
+        # Handle any exceptions that occur during the request
+        print(f"Error occurred while retrieving stats for {pokemon}: {e}")
+    
+    return None
+#-------------------
+
 # Handler function for /pokedex command
 @app.on_message(filters.command("pokedex"))
 def view_pokedex(client, message):
