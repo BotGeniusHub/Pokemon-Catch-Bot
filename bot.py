@@ -751,32 +751,6 @@ def get_user_name(user_id):
     chat_member = app.get_chat_member(chat_id="your_chat_id", user_id=user_id)  # Replace "your_chat_id" with your chat ID
     return chat_member.user.first_name if chat_member.user else "Unknown"
 
-@app.on_message(filters.command("topcatcher"))
-def top_catcher_command(client, message):
-    top_catchers = collection.aggregate([
-        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}},
-        {"$sort": {"count": -1}},
-        {"$limit": 5}
-    ])
-    
-    top_catchers = list(top_catchers)  # Convert the result to a list
-    
-    if not top_catchers:
-        client.send_message(chat_id=message.chat.id, text="No Pokemon catchers found.", reply_to_message_id=message.message_id)
-        return
-    
-    top_catcher_text = "Top 5 Pokemon Catchers:\n"
-    for i, catcher in enumerate(top_catchers, start=1):
-        user_id = catcher["_id"]
-        user_data = collection.find_one({"user_id": user_id})  
-        username = user_data["username"] if user_data and "username" in user_data else "Unknown"
-        caught_pokemon = catcher.get({"user_id": user_id})   
-        pokemon_count = caught_pokemon.count()  
-        pokemon_list = ", ".join(pokemon["name"] for pokemon in caught_pokemon)
-        top_catcher_text += f"{i}. [{username}](tg://user?id={user_id}) - {pokemon_count} Pokemon: {pokemon_list}\n"
-
-    client.send_message(chat_id=message.chat.id, text=top_catcher_text, parse_mode="Markdown", reply_to_message_id=message.message_id)
-
 
 # Global variables to track the announced Pokémon and caught Pokémon
 announced_pokemon = None
