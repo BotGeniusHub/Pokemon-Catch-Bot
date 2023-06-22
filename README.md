@@ -2,6 +2,13 @@
 
 The Pokémon Catch Bot is a Telegram bot that allows users to encounter and catch wild Pokémon in a chat group. The bot provides an interactive and fun experience for Pokémon enthusiasts.
 
+<p align="center">
+  <img src="https://graph.org/file/aeb0ba3ac025d1cb869f3.jpg" alt="Poké Catch Bot Logo" width="200" height="200">
+</p>
+
+[![License](https://img.shields.io/github/license/BotGeniusHub/Pokemon-Catch-Bot)](LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.6%2B-blue)](https://www.python.org/downloads/)
+
 ## Features
 
 - Encounter a wild Pokémon in the group chat at regular intervals.
