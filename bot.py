@@ -738,7 +738,7 @@ def view_pokedex(client, message):
         for i, pokemon_name in enumerate(pokedex_data['pokedex'], start=1):
             pokedex_list += "{}. {}\n".format(i, pokemon_name)
         pokemon_count = len(pokedex_data['pokedex'])
-        client.send_message(message.chat.id, "**Your Pokedex:**\n{}\n**Total Pokémon Caught:** {}".format(pokedex_list, pokemon_count, reply_to_message_id=message.message_id))
+        client.send_message(message.chat.id, "**Your Pokedex:**\n{}\n**Total Pokémon Caught:** {}".format(reply_to_message_id=message.message_id, pokedex_list, pokemon_count, ))
     else:
         client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
 
