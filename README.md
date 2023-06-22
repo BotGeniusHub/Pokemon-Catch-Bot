@@ -64,3 +64,9 @@ Contributions are welcome! If you have any suggestions, improvements, or bug fix
 
 ## License
 The Pokémon Catch Bot is licensed under the [![License](https://img.shields.io/github/license/BotGeniusHub/Pokemon-Catch-Bot)](LICENSE)
+
+## Contributors
+
+- [Your Name](https://github.com/BotGeniusHub) - @SexyNano
+- [Collaborator 1](https://github.com/Fraggod) - @FRAG_GOD_HACKER
+- [Collaborator 2](https://github.com/collaborator2) - @collaborator2_username
