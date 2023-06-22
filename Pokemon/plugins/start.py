@@ -1,4 +1,5 @@
 from pyrogram import Client, filter
+from Pokemon import api_id, api_hash, bot_token
 
 @app.on_message(filters.command("start"))
 def start(_, message):
