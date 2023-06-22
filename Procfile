@@ -1,1 +1,1 @@
-python3 -m Pokemon
+worker: python3 -m bot.py
