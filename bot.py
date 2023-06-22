@@ -709,7 +709,7 @@ def start(_, message):
         with open("pokemon_image.jpg", "wb") as file:
             file.write(response.content)
 
-    caption = f"You encountered a wild {pokemon_name}!\n\nUse /help for help menu!"
+    caption = f" [{}](tg://user?id={})You just encountered a wild {pokemon_name}!\n\nUse /help for help menu!"
 
     app.send_photo(
         chat_id=message.chat.id,
@@ -723,7 +723,7 @@ def help_command(client, message):
     
     image_path = "IMG_20230622_003312_519.jpg"  
     with open(image_path, "rb") as image_file:
-        caption = f"Welcome to the Pokémon Catching Bot!\n\nCommands👇🏻\n/start - Start the bot and encounter a wild Pokémon\n/catch - Attempt to catch the encountered Pokémon\n/help - Display this help menu\n/pokedex - View your Pokémon"
+        caption = f"Welcome to the Pokémon Catching Bot!\nCommands:\n/start - Start the bot and encounter a wild Pokémon\n/catch - Attempt to catch the encountered Pokémon\n/help - Display this help menu\n/pokedex - View your Pokémon"
                        
         client.send_photo(chat_id=message.chat.id, photo=image_file, caption=caption, reply_to_message_id=message.message_id)
 
