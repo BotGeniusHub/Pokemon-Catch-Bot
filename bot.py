@@ -742,6 +742,11 @@ def view_pokedex(client, message):
     else:
         client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
 
+# Function to get the user's name using Pyrogram's get_chat_member method
+def get_user_name(user_id):
+    chat_member = app.get_chat_member(chat_id="your_chat_id", user_id=user_id)  # Replace "your_chat_id" with your chat ID
+    return chat_member.user.first_name if chat_member.user else "Unknown"
+
 # Handler function for /topcatcher command
 @app.on_message(filters.command("topcatcher"))
 def top_catcher_command(client, message):
@@ -760,7 +765,7 @@ def top_catcher_command(client, message):
     top_catcher_text = "Top 5 Pokemon Catchers:\n"
     for i, catcher in enumerate(top_catchers, start=1):
         user_id = catcher["_id"]
-        user_name = get_user_name(user_id)  # Replace with your method to get the user's name
+        user_name = collection.find_one(user_id)  # Replace with your own logic to get the user's name
         catch_count = catcher["count"]
         top_catcher_text += f"{i}. {user_name} - {catch_count} Pokemon\n"
 
