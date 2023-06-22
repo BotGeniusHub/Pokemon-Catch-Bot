@@ -738,7 +738,7 @@ def view_pokedex(client, message):
         for i, pokemon_name in enumerate(pokedex_data['pokedex'], start=1):
             pokedex_list += "{}. {}\n".format(i, pokemon_name)
         pokemon_count = len(pokedex_data['pokedex'])
-        client.send_message(message.chat.id, "** {} Pokedex:**\n{}\n**Total Pokémon Caught:** {}".format(message.from_user.first_name, "@" + message.from_user.username, pokedex_list, pokemon_count), reply_to_message_id=message.message_id)
+        client.send_message(message.chat.id, "** {}(tg://user?id={})'s Pokedex:**\n{}\n**Total Pokémon Caught:** {}".format(message.from_user.first_name, message.from_user.id, pokedex_list, pokemon_count),parse_mode="Markdown" reply_to_message_id=message.message_id)
     else:
         client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
 
@@ -801,7 +801,7 @@ def catch_pokemon(client, message):
         catch_probability = random.random()
 
         if catch_probability <= announced_pokemon["catch_rate"]:
-            client.send_message(chat_id=message.chat.id, text="Congratulations {}! You caught {}!".format(message.from_user.first_name, "@" + message.from_user.username, announced_pokemon["name"], reply_to_message_id=message.message_id))
+            client.send_message(chat_id=message.chat.id, text="Congratulations {}(tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon["name"], parse_mode="Markdown", reply_to_message_id=message.message_id))
             add_to_pokedex(user_id, announced_pokemon["name"])
 
             # Add the caught Pokémon and the user who caught it to the dictionary
