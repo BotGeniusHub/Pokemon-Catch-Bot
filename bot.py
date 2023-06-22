@@ -740,16 +740,16 @@ def ptrade_command(client, message):
     
     # Check if the trade arguments are provided correctly
     if len(trade_args) != 2:
-        client.send_message(chat_id=message.chat.id, text="Invalid trade arguments. Usage: /ptrade [your Pokemon name to give] [Their Pokemon name to get].", reply_to_message_id=message.message_id)
+        client.send_message(chat_id=message.chat.id, text="Invalid trade arguments. Usage: /ptrade [your Pokémon name to give] [Their Pokémon name to get].", reply_to_message_id=message.message_id)
         return
     
-    # Extract the Pokemon names from the trade arguments
+    # Extract the Pokémon names from the trade arguments
     your_pokemon = trade_args[0]
     their_pokemon = trade_args[1]
     
-    # Check if the Pokemon names are valid (you can add additional validation logic here)
+    # Check if the Pokémon names are valid (you can add additional validation logic here)
     if not your_pokemon or not their_pokemon:
-        client.send_message(chat_id=message.chat.id, text="Invalid Pokemon names provided.", reply_to_message_id=message.message_id)
+        client.send_message(chat_id=message.chat.id, text="Invalid Pokémon names provided.", reply_to_message_id=message.message_id)
         return
     
     # Perform the trade
@@ -759,9 +759,10 @@ def ptrade_command(client, message):
     if trade_successful:
         result = f"Trade successful! You traded {your_pokemon} for {their_pokemon}."
     else:
-        result = "Trade failed. Please check your Pokemon names and try again."
+        result = "Trade failed. Please check your Pokémon names and try again."
     
     client.send_message(chat_id=message.chat.id, text=result, reply_to_message_id=message.message_id)
+
 
 # Function to perform the trade between users
 def perform_trade(user_id, your_pokemon, their_pokemon):
