@@ -764,17 +764,21 @@ def ptrade_command(client, message):
     client.send_message(chat_id=message.chat.id, text=result, reply_to_message_id=message.message_id)
 
 
-# Function to perform the trade between users
+# Function to perform the trade
 def perform_trade(user_id, your_pokemon, their_pokemon):
-    # Check if the user initiating the trade has the specified Pokemon
+    # Check if the user has the specified Pokémon
     if not has_pokemon(user_id, your_pokemon):
-        return False  # User doesn't have the specified Pokemon
-    
-    # Check if the user they want to trade with has the specified Pokemon
+        return False
+
+    # Get the ID of the user they want to trade with
     other_user_id = get_other_user_id(their_pokemon)
+    if not other_user_id:
+        return False
+
+    # Check if the other user has the specified Pokémon
     if not has_pokemon(other_user_id, their_pokemon):
-        return False  # Other user doesn't have the specified Pokemon
-    
+        return False
+        
     # Perform the actual trade (you can customize this part based on your requirements)
     remove_pokemon(user_id, your_pokemon)  # Remove the Pokemon from the initiating user
     add_pokemon(other_user_id, your_pokemon)  # Add the Pokemon to the other user
