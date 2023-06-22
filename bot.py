@@ -769,7 +769,8 @@ def top_catcher_command(client, message):
     top_catcher_text = "Top 5 Pokemon Catchers:\n"
     for i, catcher in enumerate(top_catchers, start=1):
         user_id = catcher["_id"]
-        user_name = collection.find_one(user_id)  # Replace with your own logic to get the user's name
+        user_data = collection.find_one({"user_id": user_id})
+        user_name = user_data["name"] if user_data and "name" in user_data else "Unknown"
         catch_count = catcher["count"]
         top_catcher_text += f"{i}. {user_name} - {catch_count} Pokemon\n"
 
