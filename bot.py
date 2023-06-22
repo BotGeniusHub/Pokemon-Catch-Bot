@@ -782,7 +782,7 @@ def catch_pokemon(client, message):
         else:
             client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"], reply_to_message_id=message.message_id))
     else:
-        client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name),reply_to_message_id=message.message_id)
+        client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name), reply_to_message_id=message.message_id)
 
 
 # Handler function for group messages
