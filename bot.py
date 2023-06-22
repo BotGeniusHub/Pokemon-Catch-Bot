@@ -751,7 +751,6 @@ def get_user_name(user_id):
     chat_member = app.get_chat_member(chat_id="your_chat_id", user_id=user_id)  # Replace "your_chat_id" with your chat ID
     return chat_member.user.first_name if chat_member.user else "Unknown"
 
-# Handler function for /topcatcher command
 @app.on_message(filters.command("topcatcher"))
 def top_catcher_command(client, message):
     top_catchers = collection.aggregate([
@@ -771,11 +770,10 @@ def top_catcher_command(client, message):
         user_id = catcher["_id"]
         user_data = collection.find_one({"user_id": user_id})
         user_id = user_data["_id"] if user_data and "_id" in user_data else "Unknown"
-        pokemon_count = pokemon["count"]
+        pokemon_count = catcher["count"]
         top_catcher_text += f"{i}. {user_id} - {pokemon_count} Pokemon\n"
 
     client.send_message(chat_id=message.chat.id, text=top_catcher_text, reply_to_message_id=message.message_id)
-
 
 
 # Global variables to track the announced Pokémon and caught Pokémon
