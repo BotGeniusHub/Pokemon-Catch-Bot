@@ -782,7 +782,26 @@ def perform_trade(user_id, your_pokemon, their_pokemon):
     
     return True  # Trade was successful
 
-    pass
+
+# Function to check if a user has a specific Pokemon
+def has_pokemon(user_id, pokemon_name):
+    user_data = collection.find_one({"user_id": user_id, "pokedex": {"$elemMatch": {"name": pokemon_name}}})
+    return bool(user_data)
+
+# Function to get the ID of the user they want to trade with based on the Pokemon name
+def get_other_user_id(pokemon_name):
+    other_user_data = collection.find_one({"pokedex": {"$elemMatch": {"name": pokemon_name}}})
+    if other_user_data:
+        return other_user_data["user_id"]
+    return None
+
+# Function to remove a Pokemon from a user's collection
+def remove_pokemon(user_id, pokemon_name):
+    collection.update_one({"user_id": user_id}, {"$pull": {"pokedex": {"name": pokemon_name}}})
+
+# Function to add a Pokemon to a user's collection
+def add_pokemon(user_id, pokemon_name):
+    collection.update_one({"user_id": user_id}, {"$push": {"pokedex": {"name": pokemon_name}}})
 
 
 
