@@ -761,9 +761,13 @@ def fight_command(client, message):
 
 # Function to simulate a battle between two Pokémon
 def simulate_battle(pokemon1, pokemon2):
-    # Get the stats of the two Pokémon from the PokeAPI or your desired source
+    # Get the stats of the two Pokémon from the PokeAPI
     pokemon1_stats = get_pokemon_stats(pokemon1)
     pokemon2_stats = get_pokemon_stats(pokemon2)
+    
+    # Check if the stats are available for both Pokémon
+    if pokemon1_stats is None or pokemon2_stats is None:
+        return None
     
     # Calculate the total stats of each Pokémon
     pokemon1_total_stats = sum(pokemon1_stats.values())
@@ -795,7 +799,7 @@ def get_pokemon_stats(pokemon):
             
             # Create a dictionary to store the stats
             stats_dict = {}
-           
+            
             # Iterate over the stats and extract the stat name and value
             for stat in stats:
                 stat_name = stat["stat"]["name"]
@@ -805,8 +809,11 @@ def get_pokemon_stats(pokemon):
                 stats_dict[stat_name] = stat_value
             
             return stats_dict
+        elif response.status_code == 404:
+            # Handle the case when the Pokémon data is not found
+            print(f"Could not find data for {pokemon}.")
         else:
-            # Handle the case when the request fails
+            # Handle other status codes
             print(f"Failed to retrieve stats for {pokemon}. Error code: {response.status_code}")
     
     except requests.exceptions.RequestException as e:
@@ -814,6 +821,7 @@ def get_pokemon_stats(pokemon):
         print(f"Error occurred while retrieving stats for {pokemon}: {e}")
     
     return None
+
 #-------------------
 
 # Handler function for /pokedex command
