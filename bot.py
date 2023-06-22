@@ -729,9 +729,39 @@ def help_command(client, message):
 
 
 #-----------------------
-
-
-
+# Handler function for /ptrade command
+@app.on_message(filters.command("ptrade"))
+def ptrade_command(client, message):
+    # Get the user's ID
+    user_id = message.from_user.id
+    
+    # Get the input arguments for the trade
+    trade_args = message.text.split()[1:]  # Remove the command itself
+    
+    # Check if the trade arguments are provided correctly
+    if len(trade_args) != 2:
+        client.send_message(chat_id=message.chat.id, text="Invalid trade arguments. Usage: /ptrade [your Pokemon name to give] [Their Pokemon name to get].", reply_to_message_id=message.message_id)
+        return
+    
+    # Extract the Pokemon names from the trade arguments
+    your_pokemon = trade_args[0]
+    their_pokemon = trade_args[1]
+    
+    # Check if the Pokemon names are valid (you can add additional validation logic here)
+    if not your_pokemon or not their_pokemon:
+        client.send_message(chat_id=message.chat.id, text="Invalid Pokemon names provided.", reply_to_message_id=message.message_id)
+        return
+    
+    # Perform the trade
+    trade_successful = perform_trade(user_id, your_pokemon, their_pokemon)
+    
+    # Send the trade result as a message
+    if trade_successful:
+        result = f"Trade successful! You traded {your_pokemon} for {their_pokemon}."
+    else:
+        result = "Trade failed. Please check your Pokemon names and try again."
+    
+    client.send_message(chat_id=message.chat.id, text=result, reply_to_message_id=message.message_id)
 
 #-------------------
 
