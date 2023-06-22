@@ -729,88 +729,8 @@ def help_command(client, message):
 
 
 #-----------------------
-# Handler function for /ptrade command
-@app.on_message(filters.command("ptrade"))
-def ptrade_command(client, message):
-    # Get the user's ID
-    user_id = message.from_user.id
-    
-    # Get the input arguments for the trade
-    trade_args = message.text.split()[1:]  # Remove the command itself
-    
-    # Check if the trade arguments are provided correctly
-    if len(trade_args) != 2:
-        client.send_message(chat_id=message.chat.id, text="Invalid trade arguments. Usage: /ptrade [your Pokémon name to give] [Their Pokémon name to get].", reply_to_message_id=message.message_id)
-        return
-    
-    # Extract the Pokémon names from the trade arguments
-    your_pokemon = trade_args[0]
-    their_pokemon = trade_args[1]
-    
-    # Check if the Pokémon names are valid (you can add additional validation logic here)
-    if not your_pokemon or not their_pokemon:
-        client.send_message(chat_id=message.chat.id, text="Invalid Pokémon names provided.", reply_to_message_id=message.message_id)
-        return
-    
-    # Perform the trade
-    trade_successful = perform_trade(user_id, your_pokemon, their_pokemon)
-    
-    # Send the trade result as a message
-    if trade_successful:
-        result = f"Trade successful! You traded {your_pokemon} for {their_pokemon}."
-    else:
-        result = "Trade failed. Please check your Pokémon names and try again."
-    
-    client.send_message(chat_id=message.chat.id, text=result, reply_to_message_id=message.message_id)
 
-
-# Function to perform the trade
-def perform_trade(user_id, your_pokemon, their_pokemon):
-    # Check if the user has the specified Pokémon
-    if not has_pokemon(user_id, your_pokemon):
-        return False
-
-    # Get the ID of the user they want to trade with
-    other_user_id = get_other_user_id(their_pokemon)
-    if not other_user_id:
-        return False
-
-    # Check if the other user has the specified Pokémon
-    if not has_pokemon(other_user_id, their_pokemon):
-        return False
-        
-    # Perform the actual trade (you can customize this part based on your requirements)
-    remove_pokemon(user_id, your_pokemon)  # Remove the Pokemon from the initiating user
-    add_pokemon(other_user_id, your_pokemon)  # Add the Pokemon to the other user
-    remove_pokemon(other_user_id, their_pokemon)  # Remove the Pokemon from the other user
-    add_pokemon(user_id, their_pokemon)  # Add the Pokemon to the initiating user
-    
-    return True  # Trade was successful
-
-
-# Function to check if a user has a specific Pokemon
-def has_pokemon(user_id, pokemon_name):
-    user_data = collection.find_one({"user_id": user_id, "pokedex": {"$elemMatch": {"name": pokemon_name}}})
-    return bool(user_data)
-
-# Function to get the ID of the user they want to trade with based on the Pokemon name
-def get_other_user_id(pokemon_name):
-    other_user_data = collection.find_one({"pokedex": {"$elemMatch": {"name": pokemon_name}}})
-    if other_user_data:
-        return other_user_data["user_id"]
-    return None
-
-# Function to remove a Pokemon from a user's collection
-def remove_pokemon(user_id, pokemon_name):
-    collection.update_one({"user_id": user_id}, {"$pull": {"pokedex": {"name": pokemon_name}}})
-
-# Function to add a Pokemon to a user's collection
-def add_pokemon(user_id, pokemon_name):
-    collection.update_one({"user_id": user_id}, {"$push": {"pokedex": {"name": pokemon_name}}})
-
-
-
-#-------------------
+#-----------------------
 
 # Handler function for /pokedex command
 @app.on_message(filters.command("pokedex"))
