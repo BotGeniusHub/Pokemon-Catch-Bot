@@ -67,6 +67,7 @@ The Pokémon Catch Bot is licensed under the [![License](https://img.shields.io/
 
 ## Contributors
 
-- [BotGeniusHub](https://github.com/BotGeniusHub) -> @SexyNano
-- [Fraggod](https://github.com/Fraggod) -> @FRAG_GOD_HACKER
-- [BlueKanao](https://github.com/BlueKanao) -> @BelowLord
+| ![BotGeniusHub](https://github.com/BotGeniusHub.png) | ![Collaborator 1](https://github.com/collaborator1.png) | ![Collaborator 2](https://github.com/collaborator2.png) |
+| :-------------------------------------------------: | :----------------------------------------------------: | :----------------------------------------------------: |
+|       [Your Name](https://github.com/your-username)  |      [Collaborator 1](https://github.com/collaborator1) |      [Collaborator 2](https://github.com/collaborator2) |
+|             @your_telegram_username                  |            @collaborator1_username                      |            @collaborator2_username                      |
