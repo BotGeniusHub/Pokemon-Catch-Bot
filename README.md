@@ -63,4 +63,4 @@ Contributing
 Contributions are welcome! If you have any suggestions, improvements, or bug fixes, please submit a pull request.
 
 ## License
-The Pokémon Catch Bot is licensed under the MIT License.
+The Pokémon Catch Bot is licensed under the [![License](https://img.shields.io/github/license/BotGeniusHub/Pokemon-Catch-Bot)](LICENSE)
