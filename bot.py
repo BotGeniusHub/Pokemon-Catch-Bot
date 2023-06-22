@@ -709,7 +709,7 @@ def start(_, message):
         with open("pokemon_image.jpg", "wb") as file:
             file.write(response.content)
 
-    caption = f"{}You just encountered a wild {pokemon_name}!\n\nUse /help for help menu!"
+    caption = f"You just encountered a wild {pokemon_name}!\n\nUse /help for help menu!"
 
     app.send_photo(
         chat_id=message.chat.id,
