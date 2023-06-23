@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from pyrogram import Client, filters, idle
 from pokebase import pokemon
 from uuid import uuid4
+from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Connect to MongoDB
 client = MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
@@ -697,7 +698,7 @@ api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
 bot_token = '6100943782:AAGKPWBGGuQU33zAOCuQg4jLuz8GFj38vt8'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+
 
 @app.on_message(filters.command("start"))
 def start(_, message):
@@ -714,7 +715,7 @@ def start(_, message):
     caption = f"You just encountered a wild {pokemon_name}!\n\nUse /help for the help menu!"
 
     keyboard = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Add me to a group", url="https://t.me/YourBotUsername?startgroup=new")]]
+        [[InlineKeyboardButton("+Add me to a group+", url="https://t.me/PokemonCatchBot?startgroup=new")]]
     )
 
     app.send_photo(
