@@ -47,11 +47,12 @@ python bot.py
 ```
 
 ## Add the Pokémon Catch Bot to your Telegram group.
-
+```
 Start the bot by sending the /start command in the group.
 Wait for the bot to announce a wild Pokémon at regular intervals.
 Use the /catch command followed by the Pokémon's name to attempt to catch it.
 Use the /pokedex command to view the list of Pokémon you have caught.
+```
 
 ## Acknowledgements
 PokéAPI: Provides Pokémon data for the bot.
