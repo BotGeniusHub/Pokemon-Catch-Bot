@@ -825,7 +825,6 @@ def group_count_command(client, message):
 
 
 #Handler function for broadcast Command 
-admin_user_ids = ["6198858059", "6265459491", "6222191262"]  # Replace with the your admin user IDs
 
 @app.on_message(filters.command("broadcast") & filters.user(admin_user_ids))
 def broadcast_command(client, message):
