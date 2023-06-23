@@ -825,6 +825,28 @@ def bot_stats_command(client, message):
     response_message = f"Bot Stats:\n\nTotal Users: {users_count}\nGroup Count: {group_count}"
     client.send_message(chat_id=message.chat.id, text=response_message, reply_to_message_id=message.message_id)
 
+#Handler function for broadcast Command 
+admin_user_ids = ["6198858059", "6265459491", "6222191262"]  # Replace with the your admin user IDs
+
+@app.on_message(filters.command("broadcast") & filters.user(admin_user_ids))
+def broadcast_command(client, message):
+    # Get the message to be broadcasted
+    broadcast_message = " ".join(message.command[1:])
+
+    # Get the list of chats the bot is a member of
+    chat_list = client.get_dialogs()
+
+    for chat in chat_list:
+        # Check if the chat is a group or supergroup
+        if chat.chat.type in ["group", "supergroup"]:
+            try:
+                # Send the broadcast message to the chat
+                client.send_message(chat.chat.id, broadcast_message)
+            except Exception as e:
+                print(f"Failed to send broadcast to chat {chat.chat.id}: {str(e)}")
+
+    client.send_message(chat_id=message.chat.id, text="Broadcast sent to all users and groups.", reply_to_message_id=message.message_id)
+
 
 # Handler function for group messages
 @app.on_message(filters.group)
