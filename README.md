@@ -14,7 +14,6 @@ The Pokémon Catch Bot is a Telegram bot that allows users to encounter and catc
 - Encounter a wild Pokémon in the group chat at regular intervals.
 - Catch the encountered Pokémon by using the `/catch` command.
 - View the list of Pokémon caught by a user using the `/pokedex` command.
-- See the leaderboard of the top Pokémon catchers using the `/topcatcher` command.
 
 ## Setup
 
@@ -48,13 +47,12 @@ python bot.py
 ```
 
 ## Add the Pokémon Catch Bot to your Telegram group.
-   ```bash
+
 Start the bot by sending the /start command in the group.
 Wait for the bot to announce a wild Pokémon at regular intervals.
 Use the /catch command followed by the Pokémon's name to attempt to catch it.
 Use the /pokedex command to view the list of Pokémon you have caught.
-Use the /topcatcher command to see the leaderboard of the top Pokémon catchers in the group.
-```
+
 ## Acknowledgements
 PokéAPI: Provides Pokémon data for the bot.
 Pyrogram: Python library for interacting with the Telegram API.
