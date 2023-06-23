@@ -809,31 +809,6 @@ def catch_pokemon(client, message):
 
 
 
-#Handler function for broadcast Command 
-app = Client("bot_token", "bot_id", parse_mode="markdown")
-
-admin_user_ids = ["6198858059", "6265459491", "6222191262"]
-
-@app.on_message(filters.command("broadcast") & filters.user(admin_user_ids))
-def broadcast_command(client, message):
-    # Get the message to be broadcasted
-    broadcast_message = " ".join(message.command[1:])
-
-    # Get the list of chats the bot is a member of
-    chat_list = client.get_dialogs()
-
-    for chat in chat_list:
-        # Chek if the chat is a group or supergroup
-        if chat.chat.type in ["group", "supergroup"]:
-            try:
-                # Send the broadcast message to the chat
-                client.send_message(chat.chat.id, broadcast_message)
-            except Exception as e:
-                print(f"Failed to send broadcast to chat {chat.chat.id}: {str(e)}")
-
-    client.send_message(chat_id=message.chat.id, text="Broadcast sent to all users and groups.", reply_to_message_id=message.message_id)
-
-
 # Handler function for group messages
 @app.on_message(filters.group)
 def group_message(client, message):
