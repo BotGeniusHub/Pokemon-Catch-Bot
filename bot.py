@@ -686,7 +686,7 @@ pokemon_database = [
     {"name": "Floette", "catch_rate": 120},
     {"name": "Florges", "catch_rate": 45}, 
 
-]
+] # Add more Pokémon
 
 # Global variables to track the group message count and the currently announced Pokémon
 message_count = 0
