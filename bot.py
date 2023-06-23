@@ -715,8 +715,12 @@ def start(_, message):
     caption = f"You just encountered a wild {pokemon_name}!\nUse /help for the help menu!"
 
     keyboard = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("+Add me to a group+", url="https://t.me/PokemonCatchBot?startgroup=new")]], 
-        [[InlineKeyboardButton("Support Us", url="https://t.me/BotGeniusHub")]]
+        [
+            [
+                InlineKeyboardButton("Join Channel", url="https://t.me/BotGeniusHub"),
+                InlineKeyboardButton("Add me to a Group", url="https://t.me/PokemonCatcherXBot?startgroup=new")
+            ]
+        ]
     )
 
     app.send_photo(
