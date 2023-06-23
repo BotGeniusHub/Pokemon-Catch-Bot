@@ -809,18 +809,18 @@ def catch_pokemon(client, message):
 
 
 #Handler function for Botstats
-@app.on_message(filters.command("botstats"))
-def bot_stats_command(client, message):
-    # Get total user count
-    users_count = client.get_chat_members_count(message.chat.id)
+admin_user_ids = ["6198858059", "6265459491", "6222191262"]
 
-    # Get group count
+@app.on_message(filters.command("groupcount") & filters.user(admin_user_ids))
+def group_count_command(client, message):
     group_count = 0
+
     for chat in client.iter_dialogs():
+        
         if chat.chat.type in ["group", "supergroup"]:
             group_count += 1
 
-    response_message = f"Bot Stats:\n\nTotal Users: {users_count}\nGroup Count: {group_count}"
+    response_message = f"The bot is currently added to {group_count} groups."
     client.send_message(chat_id=message.chat.id, text=response_message, reply_to_message_id=message.message_id)
 
 
