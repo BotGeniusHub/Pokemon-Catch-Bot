@@ -8,7 +8,7 @@ from uuid import uuid4
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Connect to MongoDB
-client = MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
+client = MongoClient('{Your mongodb url}')
 db = client['pokemon_bot']
 collection = db['pokedex']
 
@@ -693,9 +693,9 @@ message_count = 0
 announced_pokemon = None
 
 # Create a Pyrogram client
-api_id = 16743442
-api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
-bot_token = '6100943782:AAGKPWBGGuQU33zAOCuQg4jLuz8GFj38vt8'
+api_id = your api id
+api_hash = 'your api hash'
+bot_token = 'telegram bot token'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
 
