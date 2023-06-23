@@ -697,6 +697,8 @@ api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
 bot_token = '6100943782:AAGKPWBGGuQU33zAOCuQg4jLuz8GFj38vt8'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+
 @app.on_message(filters.command("start"))
 def start(_, message):
     # Send an image with a caption
@@ -709,14 +711,20 @@ def start(_, message):
         with open("pokemon_image.jpg", "wb") as file:
             file.write(response.content)
 
-    caption = f"You just encountered a wild {pokemon_name}!\n\nUse /help for help menu!"
+    caption = f"You just encountered a wild {pokemon_name}!\n\nUse /help for the help menu!"
+
+    keyboard = InlineKeyboardMarkup(
+        [[InlineKeyboardButton("Add me to a group", url="https://t.me/YourBotUsername?startgroup=new")]]
+    )
 
     app.send_photo(
         chat_id=message.chat.id,
         photo="https://graph.org/file/58ca90f1f28d86419205e.jpg",
         caption=caption,
         reply_to_message_id=message.message_id,
+        reply_markup=keyboard,
     )
+
 
 @app.on_message(filters.command("help"))
 def help_command(client, message):
