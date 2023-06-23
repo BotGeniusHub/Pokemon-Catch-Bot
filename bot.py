@@ -808,23 +808,11 @@ def catch_pokemon(client, message):
         client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name), reply_to_message_id=message.message_id)
 
 
-#Handler function for Botstats
-admin_user_ids = ["6198858059", "6265459491", "6222191262"]
-
-@app.on_message(filters.command("groupcount") & filters.user(admin_user_ids))
-def group_count_command(client, message):
-    group_count = 0
-
-    for chat in client.iter_dialogs():
-        
-        if chat.chat.type in ["group", "supergroup"]:
-            group_count += 1
-
-    response_message = f"The bot is currently added to {group_count} groups."
-    client.send_message(chat_id=message.chat.id, text=response_message, reply_to_message_id=message.message_id)
-
 
 #Handler function for broadcast Command 
+app = Client("bot_token", "bot_id", parse_mode="markdown")
+
+admin_user_ids = ["6198858059", "6265459491", "6222191262"]
 
 @app.on_message(filters.command("broadcast") & filters.user(admin_user_ids))
 def broadcast_command(client, message):
@@ -835,7 +823,7 @@ def broadcast_command(client, message):
     chat_list = client.get_dialogs()
 
     for chat in chat_list:
-        # Check if the chat is a group or supergroup
+        # Chek if the chat is a group or supergroup
         if chat.chat.type in ["group", "supergroup"]:
             try:
                 # Send the broadcast message to the chat
