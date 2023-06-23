@@ -64,9 +64,7 @@ Contributions are welcome! If you have any suggestions, improvements, or bug fix
 ## License
 The Pokémon Catch Bot is licensed under the [![License](https://img.shields.io/github/license/BotGeniusHub/Pokemon-Catch-Bot)](LICENSE)
 
-## Contributors
-
-| <img src="https://github.com/BotGeniusHub.png" width="50px" height="50px"> | <img src="https://github.com/BlueKanao.png" width="50px" height="50px"> | <img src="https://github.com/Fraggod.png" width="50px" height="50px"> |
-| :------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
-|                       [BotGeniusHub](https://github.com/BotGeniusHub)                |               [BlueKanao](https://github.com/BlueKanao)                |               [Fraggod](https://github.com/Fraggod)                |
-|                                 @SexyNano                           |                           @BelowLord                                |                           @FRAG_GOD_HACKER                                |
+| <img src="https://github.com/BotGeniusHub.png" width="50px" height="50px"> | <img src="https://github.com/BlueKanao.png" width="50px" height="50px"> | <img src="https://github.com/Fraggod.png" width="50px" height="50px"> | <img src="https://github.com/FourthContributor.png" width="50px" height="50px"> |
+| :------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
+|                       [BotGeniusHub](https://github.com/BotGeniusHub)                |               [BlueKanao](https://github.com/BlueKanao)                |               [Fraggod](https://github.com/Fraggod)                |               [Fourth Contributor](https://github.com/FourthContributor)                |
+|                                 @SexyNano                           |                           @BelowLord                                |                           @FRAG_GOD_HACKER                                |                           @FourthContributorUsername                                |
