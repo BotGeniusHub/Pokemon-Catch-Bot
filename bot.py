@@ -809,21 +809,20 @@ def catch_pokemon(client, message):
 
 
 #Handler function for Botstats
-@app.on_message(filters.command("botstats"))
+@@app.on_message(filters.command("botstats"))
 def bot_stats_command(client, message):
     # Get total user count
     users_count = client.get_chat_members_count(message.chat.id)
 
     # Get group count
-    chat_list = client.get_dialogs()
     group_count = 0
-    for chat in chat_list:
-        chat_info = client.get_chat(chat.chat.id)
-        if chat_info.type in ["group", "supergroup"]:
+    for chat in client.iter_dialogs():
+        if chat.chat.type in ["group", "supergroup"]:
             group_count += 1
 
     response_message = f"Bot Stats:\n\nTotal Users: {users_count}\nGroup Count: {group_count}"
     client.send_message(chat_id=message.chat.id, text=response_message, reply_to_message_id=message.message_id)
+
 
 #Handler function for broadcast Command 
 admin_user_ids = ["6198858059", "6265459491", "6222191262"]  # Replace with the your admin user IDs
