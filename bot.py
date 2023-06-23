@@ -809,7 +809,7 @@ def catch_pokemon(client, message):
 
 
 #Handler function for Botstats
-@@app.on_message(filters.command("botstats"))
+@app.on_message(filters.command("botstats"))
 def bot_stats_command(client, message):
     # Get total user count
     users_count = client.get_chat_members_count(message.chat.id)
