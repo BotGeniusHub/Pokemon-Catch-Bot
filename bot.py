@@ -6,6 +6,8 @@ from pyrogram import Client, filters, idle
 from pokebase import pokemon
 from uuid import uuid4
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from PIL import Image, ImageDraw, ImageFont
+
 
 # Connect to MongoDB
 client = MongoClient('mongodb+srv://jarvis:op@cluster0.7tisvwv.mongodb.net/?retryWrites=true&w=majority')
