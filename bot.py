@@ -115,10 +115,16 @@ def view_pokedex(client, message):
         keyboard = InlineKeyboardMarkup(
             [
                 [
+                    InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {current_page - 1}"),
                     InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {current_page + 1}")
                 ]
             ]
         )
+
+        if current_page == 1:
+            keyboard.inline_keyboard[0].pop(0)  # Remove the "Previous Page" button for the first page
+        elif current_page == total_pages:
+            keyboard.inline_keyboard[0].pop()  # Remove the "Next Page" button for the last page
 
         client.send_message(
             message.chat.id,
