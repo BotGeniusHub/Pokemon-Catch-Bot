@@ -179,10 +179,14 @@ def handle_callback_query(client, callback_query):
             keyboard = InlineKeyboardMarkup(
                 [
                     [
+                        InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {next_page - 1}"),
                         InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {next_page + 1}")
                     ]
                 ]
             )
+
+            if next_page == 1:
+                keyboard.inline_keyboard[0].pop(0)  # Remove the "Previous Page" button for the first page
 
             client.edit_message_text(
                 chat_id=message.chat.id,
@@ -193,6 +197,68 @@ def handle_callback_query(client, callback_query):
             )
 
             client.answer_callback_query(callback_query.id, text="Page {} of {}".format(next_page, total_pages))
+        else:
+            client.answer_callback_query(callback_query.id, text="Your Pokedex is empty.")
+
+    elif callback_data.startswith("prev_pokedex_page"):
+        try:
+            _, prev_page = callback_data.split()
+            prev_page = int(prev_page)
+            if prev_page < 1:
+                raise ValueError()
+        except (ValueError, IndexError):
+            client.answer_callback_query(callback_query.id, text="Invalid page number.")
+            return
+
+        pokedex_data = collection.find_one({"user_id": user_id})
+        if pokedex_data:
+            pokedex = pokedex_data['pokedex']
+            total_pokemon = len(pokedex)
+            page_size = 10
+            total_pages = (total_pokemon - 1) // page_size + 1
+
+            if prev_page < 1:
+                client.answer_callback_query(callback_query.id, text="No more previous pages.")
+                return
+
+            start_index = (prev_page - 1) * page_size
+            end_index = start_index + page_size
+            current_pokedex = pokedex[start_index:end_index]
+
+            pokedex_list = ""
+            for i, pokemon_name in enumerate(current_pokedex, start=start_index + 1):
+                pokedex_list += "{}. {}\n".format(i, pokemon_name)
+
+            caption = "** [{}](tg://user?id={}) 's Pokedex (Page {}/{}) **\n{}\n*Total Pokémon Caught:* {}".format(
+                message.from_user.first_name,
+                message.from_user.id,
+                prev_page,
+                total_pages,
+                pokedex_list,
+                total_pokemon
+            )
+
+            keyboard = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {prev_page - 1}"),
+                        InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {prev_page + 1}")
+                    ]
+                ]
+            )
+
+            if prev_page == total_pages:
+                keyboard.inline_keyboard[0].pop()  # Remove the "Next Page" button for the last page
+
+            client.edit_message_text(
+                chat_id=message.chat.id,
+                message_id=message.message_id,
+                text=caption,
+                reply_markup=keyboard,
+                parse_mode="Markdown"
+            )
+
+            client.answer_callback_query(callback_query.id, text="Page {} of {}".format(prev_page, total_pages))
         else:
             client.answer_callback_query(callback_query.id, text="Your Pokedex is empty.")
 
