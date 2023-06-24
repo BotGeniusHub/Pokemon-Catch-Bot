@@ -833,7 +833,7 @@ def group_message(client, message):
             image_file.write(image_response.content)
 
         # Send the Pokémon image and announcement message
-        client.send_photo(message.chat.id, photo=image_file_name, caption="A wild Pokemon appeared! Type ```/ catch Name``` to catch it.") 
+        client.send_photo(message.chat.id, photo=image_file_name, caption="A wild Pokemon appeared! Type /catch ```Name``` to catch it.") 
         # Remove the downloaded image file
         image_file.close()
         os.remove(image_file_name)
