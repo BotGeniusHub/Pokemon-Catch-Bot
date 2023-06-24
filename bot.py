@@ -14,8 +14,12 @@ db = client['pokemon_bot']
 collection = db['pokedex']
 
 
+# Create a Pyrogram client
+api_id = your api id
+api_hash = 'your api hash'
+bot_token = 'telegram bot token'
+app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
-    
 @app.on_message(filters.command("start"))
 def start(_, message):
     # Send an image with a caption
