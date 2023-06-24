@@ -740,6 +740,13 @@ def help_command(client, message):
         caption = f"Welcome to the Pokémon Catching Bot!\nCommands:\n/start - Start the bot and encounter a wild Pokémon\n/catch - Attempt to catch the encountered Pokémon\n/help - Display this help menu\n/pokedex - View your Pokémon\n\n You have any issues with bot join our channel and send us what issues you face..Thank you ❤"
                        
         client.send_photo(chat_id=message.chat.id, photo=image_file, caption=caption, reply_to_message_id=message.message_id)
+       
+        keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("Join Support Group", url="https://t.me/BotXDevelopments"),
+        ]
+        )
 
 
 #-----------------------
