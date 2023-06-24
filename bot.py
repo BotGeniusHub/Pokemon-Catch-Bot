@@ -695,7 +695,7 @@ announced_pokemon = None
 # Create a Pyrogram client
 api_id = 16743442
 api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
-bot_token = '6100943782:AAE5zJH20Q3QjLH3Fb789XG16AyMNmTC8ew'
+bot_token = '6100943782:AAG9DRpPrYJH2Q3OwxEQjcm9MdlPicSZgsI'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
 
