@@ -807,18 +807,15 @@ def ball_command(client, message):
     pokemon_name = command_parts[1].lower()
 
     if pokemon_name == announced_pokemon:
-        # Add the Pokémon to the user's Pokédex
+        # Pokémon caught successfully
+        client.send_message(chat_id=message.chat.id, text="Congratulations! You caught the Pokémon!")
         user_pokedex.append(pokemon_name)
-
-        client.send_message(
-            chat_id=message.chat.id,
-            text=f"Congratulations! You caught {pokemon_name.capitalize()}!"
-        )
     else:
-        client.send_message(
-            chat_id=message.chat.id,
-            text=f"Oops! {pokemon_name.capitalize()} is not the Pokémon to catch."
-        )
+        # Incorrect Pokémon name
+        client.send_message(chat_id=message.chat.id, text="Oops! That's not the correct Pokémon.")
+
+    # Reset the announced Pokémon
+    announced_pokemon = None
 
     # Clear the announced Pokémon
     announced_pokemon = None
