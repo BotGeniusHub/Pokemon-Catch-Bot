@@ -734,35 +734,15 @@ def start(_, message):
     )
 
 
-@app.on_message(filters.command("help"))
-def help_command(client, message):
-    
-    image_path = "IMG_20230622_003312_519.jpg"  
-    with open(image_path, "rb") as image_file:
-        caption = f"Welcome to the Pokémon Catching Bot!\nCommands:\n/start - Start the bot and encounter a wild Pokémon\n/catch - Attempt to catch the encountered Pokémon\n/help - Display this help menu\n/pokedex - View your Pokémon\n\n You have any issues with bot join our channel and send us what issues you face..Thank you ❤"
-                       
-        client.send_photo(chat_id=message.chat.id, photo=image_file, caption=caption, reply_to_message_id=message.message_id)
-       
-        keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("Join Support Group", url="https://t.me/BotXDevelopments"),
-                    InlineKeyboardButton("Channel", url="https://t.me/BotGeniusHub"),
-
-                ]
-            ]
-        )
-
-            
 @app.on_inline_query()
 def inline_query(client, inline_query):
     user_id = inline_query.from_user.id
 
     results = []
 
-    if user_id in pokedex_data:
+    if user_id in user_pokedex:
         # Iterate over the user's caught Pokémon and create results for each Pokémon
-        for pokemon_name in pokedex_data[user_id]:
+        for pokemon_name in user_pokedex[user_id]:
             pokemon_info = pokemon(pokemon_name)
             image_url = pokemon_info.sprites.front_default
 
@@ -790,6 +770,27 @@ def inline_query(client, inline_query):
         inline_query_id=inline_query.id,
         results=results
     )
+
+
+@app.on_callback_query()
+def callback_query(client, callback_query):
+    user_id = callback_query.from_user.id
+
+    # Get the Pokémon name from the callback data
+    pokemon_name = callback_query.data.split("_")[1]
+
+    if pokemon_name in user_pokedex[user_id]:
+        # Release the Pokémon from the user's Pokédex
+        user_pokedex[user_id].remove(pokemon_name)
+        client.answer_callback_query(
+            callback_query_id=callback_query.id,
+            text="You released " + pokemon_name + " from your Pokédex."
+        )
+    else:
+        client.answer_callback_query(
+            callback_query_id=callback_query.id,
+            text="You don't have " + pokemon_name + " in your Pokédex."
+        )
 
 
 @app.on_callback_query()
