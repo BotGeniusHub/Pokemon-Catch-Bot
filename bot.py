@@ -771,12 +771,13 @@ def guess_command(client, message):
 
     # Draw a question mark over the Pokémon image
     image = Image.open("pokemon_image.jpg")
+    image = image.convert("RGB")  # Convert to RGB mode
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("arial.ttf", size=50)
     text_width, text_height = draw.textsize("?", font=font)
     text_position = ((image.width - text_width) // 2, (image.height - text_height) // 2)
     draw.text(text_position, "?", fill="white", font=font)
-    image.save("guess_image.jpg")
+    image.save("guess_image.jpg", "JPEG")  # Save as JPEG
 
     # Send the modified image to the user
     with open("guess_image.jpg", "rb") as file:
