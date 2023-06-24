@@ -733,86 +733,72 @@ def start(_, message):
         reply_markup=keyboard,
     )
 
+# Global variables to track the announced Pokémon and caught Pokémon
+announced_pokemon = None
+pokedex_data = {}
 
-@app.on_inline_query()
-def inline_query(client, inline_query):
-    user_id = inline_query.from_user.id
+# Handler function for /gift command
+@app.on_message(filters.command("gift"))
+def gift_pokemon(client, message):
+    global announced_pokemon, user_pokedex  # Declare announced_pokemon and pokedex_data as global variables
+    user_id = message.from_user.id
+    user_input = message.text
+    pokemon_name = user_input.split("/gift ", 1)[-1].lower()
 
-    results = []
+    # Check if the Pokémon is in the user's Pokedex
+    if pokemon_name not in pokedex_data.get(user_id, []):
+        client.send_message(chat_id=message.chat.id, text="You don't have {} in your Pokedex.".format(pokemon_name), reply_to_message_id=message.message_id)
+        return
 
-    if user_id in user_pokedex:
-        # Iterate over the user's caught Pokémon and create results for each Pokémon
-        for pokemon_name in user_pokedex[user_id]:
-            pokemon_info = pokemon(pokemon_name)
-            image_url = pokemon_info.sprites.front_default
+    # Set the announced_pokemon to the chosen Pokémon
+    announced_pokemon = pokemon_name
 
-            # Create a unique identifier for the result
-            result_id = str(user_id) + "_" + pokemon_name
+    client.send_message(chat_id=message.chat.id, text="Reply to the user you want to gift {}.".format(pokemon_name), reply_to_message_id=message.message_id)
 
-            # Create an InlineQueryResultPhoto object for each Pokémon
-            result = InlineQueryResultPhoto(
-                id=result_id,
-                photo_url=image_url,
-                thumb_url=image_url,
-                caption=pokemon_name,
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton("Release", callback_data=result_id)
-                        ]
-                    ]
-                )
-            )
-            results.append(result)
+# Handler function for user replies
+@app.on_message(filters.reply & ~filters.me)
+def gift_pokemon_reply(client, message):
+    global announced_pokemon, pokedex_data
+    sender_id = message.from_user.id
+    receiver_id = message.reply_to_message.from_user.id
 
-    # Answer the inline query with the list of results
-    client.answer_inline_query(
-        inline_query_id=inline_query.id,
-        results=results
-    )
+    # Check if a Pokémon is announced for gifting
+    if announced_pokemon is None:
+        return
 
+    # Check if the sender has the announced Pokémon in their Pokedex
+    if announced_pokemon not in pokedex_data.get(sender_id, []):
+        client.send_message(chat_id=message.chat.id, text="You don't have {} in your Pokedex.".format(announced_pokemon), reply_to_message_id=message.message_id)
+        return
 
-@app.on_callback_query()
-def callback_query(client, callback_query):
-    user_id = callback_query.from_user.id
+    # Add the caught Pokémon to the receiver's Pokedex
+    add_to_pokedex(receiver_id, announced_pokemon)
 
-    # Get the Pokémon name from the callback data
-    pokemon_name = callback_query.data.split("_")[1]
+    client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You received {} as a gift from [{}](tg://user?id={})!".format(message.reply_to_message.from_user.first_name, receiver_id, announced_pokemon, message.from_user.first_name, sender_id), parse_mode="Markdown", reply_to_message_id=message.reply_to_message.message_id)
 
-    if pokemon_name in user_pokedex[user_id]:
-        # Release the Pokémon from the user's Pokédex
-        user_pokedex[user_id].remove(pokemon_name)
-        client.answer_callback_query(
-            callback_query_id=callback_query.id,
-            text="You released " + pokemon_name + " from your Pokédex."
-        )
+    # Remove the gifted Pokémon from the sender's Pokedex
+    remove_from_pokedex(sender_id, announced_pokemon)
+
+    # Set announced_pokemon to None to allow the announcement of a new Pokémon
+    announced_pokemon = None
+
+# Function to add a caught Pokémon to the user's Pokedex
+def add_to_pokedex(user_id, pokemon_name):
+    if user_id in pokedex_data:
+        pokedex = pokedex_data[user_id]
+        if pokemon_name not in pokedex:
+            pokedex.append(pokemon_name)
     else:
-        client.answer_callback_query(
-            callback_query_id=callback_query.id,
-            text="You don't have " + pokemon_name + " in your Pokédex."
-        )
+        pokedex_data[user_id] = [pokemon_name]
 
-
-@app.on_callback_query()
-def callback_query(client, callback_query):
-    user_id = callback_query.from_user.id
-
-    # Get the Pokémon name from the callback data
-    pokemon_name = callback_query.data.split("_")[1]
-
-    if pokemon_name in pokedex_data[user_id]:
-        # Release the Pokémon from the user's Pokédex
-        pokedex_data[user_id].remove(pokemon_name)
-        client.answer_callback_query(
-            callback_query_id=callback_query.id,
-            text="You released " + pokemon_name + " from your Pokédex."
-        )
-    else:
-        client.answer_callback_query(
-            callback_query_id=callback_query.id,
-            text="You don't have " + pokemon_name + " in your Pokédex."
-        )
-
+# Function to remove a Pokémon from the user's Pokedex
+def remove_from_pokedex(user_id, pokemon_name):
+    if user_id in pokedex_data:
+        pokedex = pokedex_data[user_id]
+        if pokemon_name in pokedex:
+            pokedex.remove(pokemon_name)
+            if len(pokedex) == 0:
+                del pokedex_data[user_id]
 
 #-----------------------
 @app.on_message(filters.command("guess"))
@@ -848,7 +834,7 @@ def guess_command(client, message):
     
 @app.on_message(filters.command("ball"))
 def ball_command(client, message):
-    global announced_pokemon, user_pokedex
+    global announced_pokemon, pokedex_data
 
     if not announced_pokemon:
         client.send_message(
@@ -868,7 +854,7 @@ def ball_command(client, message):
     if pokemon_name == announced_pokemon:
         # Pokémon caught successfully
         client.send_message(chat_id=message.chat.id, text="Congratulations! You caught the Pokémon!")
-        user_pokedex.append(pokemon_name)
+        pokedex_data
     else:
         # Incorrect Pokémon name
         client.send_message(chat_id=message.chat.id, text="Oops! That's not the correct Pokémon.")
