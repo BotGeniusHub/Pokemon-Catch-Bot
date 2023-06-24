@@ -13,6 +13,9 @@ client = MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?
 db = client['pokemon_bot']
 collection = db['pokedex']
 
+# Global variables to track the group message count and the currently announced Pokémon
+message_count = 0
+announced_pokemon = None
 
 # Create a Pyrogram client
 api_id = 16743442
