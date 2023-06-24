@@ -75,18 +75,127 @@ def view_pokedex(client, message):
     user_id = message.from_user.id
     pokedex_data = collection.find_one({"user_id": user_id})
     if pokedex_data:
+        pokedex = pokedex_data['pokedex']
+        total_pokemon = len(pokedex)
+
+        if total_pokemon == 0:
+            client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
+            return
+
+        page_size = 10  # Number of Pokémon to display per page
+        current_page = 1
+        total_pages = (total_pokemon - 1) // page_size + 1
+
+        if 'pokedex_page' in message.command:
+            try:
+                current_page = int(message.command[1])
+                if current_page < 1 or current_page > total_pages:
+                    raise ValueError()
+            except (ValueError, IndexError):
+                client.send_message(message.chat.id, "Invalid page number.", reply_to_message_id=message.message_id)
+                return
+
+        start_index = (current_page - 1) * page_size
+        end_index = start_index + page_size
+        current_pokedex = pokedex[start_index:end_index]
+
         pokedex_list = ""
-        for i, pokemon_name in enumerate(pokedex_data['pokedex'], start=1):
+        for i, pokemon_name in enumerate(current_pokedex, start=start_index + 1):
             pokedex_list += "{}. {}\n".format(i, pokemon_name)
-        pokemon_count = len(pokedex_data['pokedex'])
-        client.send_message(message.chat.id, "** [{}](tg://user?id={}) 's Pokedex:**\n{}\n**Total Pokémon Caught:** {}".format(message.from_user.first_name, message.from_user.id, pokedex_list, pokemon_count),parse_mode="Markdown", reply_to_message_id=message.message_id)
+
+        caption = "** [{}](tg://user?id={}) 's Pokedex (Page {}/{}) **\n{}\n*Total Pokémon Caught:* {}".format(
+            message.from_user.first_name,
+            message.from_user.id,
+            current_page,
+            total_pages,
+            pokedex_list,
+            total_pokemon
+        )
+
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {current_page + 1}")
+                ]
+            ]
+        )
+
+        client.send_message(
+            message.chat.id,
+            caption,
+            reply_to_message_id=message.message_id,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
     else:
         client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
 
-# Function to get the user's name using Pyrogram's get_chat_member method
-def get_user_name(user_id):
-    chat_member = app.get_chat_member(chat_id="your_chat_id", user_id=user_id)  # Replace "your_chat_id" with your chat ID
-    return chat_member.user.first_name if chat_member.user else "Unknown"
+
+# Handler function for callback queries
+@app.on_callback_query()
+def handle_callback_query(client, callback_query):
+    user_id = callback_query.from_user.id
+    message = callback_query.message
+    callback_data = callback_query.data
+
+    if callback_data.startswith("next_pokedex_page"):
+        try:
+            _, next_page = callback_data.split()
+            next_page = int(next_page)
+            if next_page < 1:
+                raise ValueError()
+        except (ValueError, IndexError):
+            client.answer_callback_query(callback_query.id, text="Invalid page number.")
+            return
+
+        pokedex_data = collection.find_one({"user_id": user_id})
+        if pokedex_data:
+            pokedex = pokedex_data['pokedex']
+            total_pokemon = len(pokedex)
+            page_size = 10
+            total_pages = (total_pokemon - 1) // page_size + 1
+
+            if next_page > total_pages:
+                client.answer_callback_query(callback_query.id, text="No more pages available.")
+                return
+
+            start_index = (next_page - 1) * page_size
+            end_index = start_index + page_size
+            current_pokedex = pokedex[start_index:end_index]
+
+            pokedex_list = ""
+            for i, pokemon_name in enumerate(current_pokedex, start=start_index + 1):
+                pokedex_list += "{}. {}\n".format(i, pokemon_name)
+
+            caption = "** [{}](tg://user?id={}) 's Pokedex (Page {}/{}) **\n{}\n*Total Pokémon Caught:* {}".format(
+                message.from_user.first_name,
+                message.from_user.id,
+                next_page,
+                total_pages,
+                pokedex_list,
+                total_pokemon
+            )
+
+            keyboard = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {next_page + 1}")
+                    ]
+                ]
+            )
+
+            client.edit_message_text(
+                chat_id=message.chat.id,
+                message_id=message.message_id,
+                text=caption,
+                reply_markup=keyboard,
+                parse_mode="Markdown"
+            )
+
+            client.answer_callback_query(callback_query.id, text="Page {} of {}".format(next_page, total_pages))
+        else:
+            client.answer_callback_query(callback_query.id, text="Your Pokedex is empty.")
+
 
 
 # Global variables to track the announced Pokémon and caught Pokémon
