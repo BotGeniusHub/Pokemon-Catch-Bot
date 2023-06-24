@@ -15,9 +15,9 @@ collection = db['pokedex']
 
 
 # Create a Pyrogram client
-api_id = your api id
-api_hash = 'your api hash'
-bot_token = 'telegram bot token'
+api_id = 16743442
+api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
+bot_token = '5827224610:AAGftR84QtQ6rMr7_r2a7zPPjg1SrG755yA'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
 @app.on_message(filters.command("start"))
