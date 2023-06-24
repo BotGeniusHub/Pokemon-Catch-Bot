@@ -103,7 +103,7 @@ def view_pokedex(client, message):
         for i, pokemon_name in enumerate(current_pokedex, start=start_index + 1):
             pokedex_list += "{}. {}\n".format(i, pokemon_name)
 
-        caption = "**Your Pokedex (Page {}/{}) **\n{}\n**Total Pokémon Caught:** {}".format(
+        caption = "** [{}](tg://user?id={}) 's Pokedex (Page {}/{}) **\n{}\n**Total Pokémon Caught:** {}".format(
             message.from_user.first_name,
             message.from_user.id,
             current_page,
@@ -173,7 +173,7 @@ def handle_callback_query(client, callback_query):
             for i, pokemon_name in enumerate(current_pokedex, start=start_index + 1):
                 pokedex_list += "{}. {}\n".format(i, pokemon_name)
 
-            caption = "**Your Pokedex (Page {}/{}) **\n{}\n**Total Pokémon Caught:** {}".format(
+            caption = "** [{}](tg://user?id={}) 's Pokedex (Page {}/{}) **\n{}\n**Total Pokémon Caught:** {}".format(
                 message.from_user.first_name,
                 message.from_user.id,
                 next_page,
