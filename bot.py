@@ -787,28 +787,41 @@ def guess_command(client, message):
     global announced_pokemon
     announced_pokemon = pokemon_name.lower()
     
-@app.on_message(filters.command("/ball"))
-def catch_pokemon(client, message):
-    global announced_pokemon
+@app.on_message(filters.command("ball"))
+def ball_command(client, message):
+    global announced_pokemon, user_pokedex
 
-    # Check if a Pokémon is currently announced
-    if announced_pokemon is None:
-        client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.", reply_to_message_id=message.message_id)
+    if not announced_pokemon:
+        client.send_message(
+            chat_id=message.chat.id,
+            text="No Pokémon to catch. Type /guess to start a new guessing game."
+        )
         return
 
-    # Check if the caught Pokémon matches the announced Pokémon or the guess answer
-    user_input = message.text.split("/catch ", 1)[-1].lower()
-    if user_input == announced_pokemon:
-        # Correct guess
-        client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon), parse_mode="Markdown", reply_to_message_id=message.message_id)
-        add_to_pokedex(message.from_user.id, announced_pokemon)
+    # Get the Pokémon name provided by the user
+    command_parts = message.text.split(" ")
+    if len(command_parts) < 2:
+        client.send_message(chat_id=message.chat.id, text="Please provide a Pokémon name.")
+        return
 
-        # Reset the announced Pokémon
-        announced_pokemon = None
+    pokemon_name = command_parts[1].lower()
+
+    if pokemon_name == announced_pokemon:
+        # Add the Pokémon to the user's Pokédex
+        user_pokedex.append(pokemon_name)
+
+        client.send_message(
+            chat_id=message.chat.id,
+            text=f"Congratulations! You caught {pokemon_name.capitalize()}!"
+        )
     else:
-        # Incorrect guess
-        client.send_message(chat_id=message.chat.id, text="Oh no! Your guess is incorrect.", reply_to_message_id=message.message_id)
+        client.send_message(
+            chat_id=message.chat.id,
+            text=f"Oops! {pokemon_name.capitalize()} is not the Pokémon to catch."
+        )
 
+    # Clear the announced Pokémon
+    announced_pokemon = None
 #-----------------------
 
 # Handler function for /pokedex command
