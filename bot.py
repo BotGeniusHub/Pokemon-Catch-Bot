@@ -754,6 +754,64 @@ def help_command(client, message):
         )
 
             
+@app.on_inline_query()
+def inline_query(client, inline_query):
+    user_id = inline_query.from_user.id
+
+    results = []
+
+    if user_id in pokedex_data:
+        # Iterate over the user's caught Pokémon and create results for each Pokémon
+        for pokemon_name in pokedex_data[user_id]:
+            pokemon_info = pokemon(pokemon_name)
+            image_url = pokemon_info.sprites.front_default
+
+            # Create a unique identifier for the result
+            result_id = str(user_id) + "_" + pokemon_name
+
+            # Create an InlineQueryResultPhoto object for each Pokémon
+            result = InlineQueryResultPhoto(
+                id=result_id,
+                photo_url=image_url,
+                thumb_url=image_url,
+                caption=pokemon_name,
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton("Release", callback_data=result_id)
+                        ]
+                    ]
+                )
+            )
+            results.append(result)
+
+    # Answer the inline query with the list of results
+    client.answer_inline_query(
+        inline_query_id=inline_query.id,
+        results=results
+    )
+
+
+@app.on_callback_query()
+def callback_query(client, callback_query):
+    user_id = callback_query.from_user.id
+
+    # Get the Pokémon name from the callback data
+    pokemon_name = callback_query.data.split("_")[1]
+
+    if pokemon_name in pokedex_data[user_id]:
+        # Release the Pokémon from the user's Pokédex
+        pokedex_data[user_id].remove(pokemon_name)
+        client.answer_callback_query(
+            callback_query_id=callback_query.id,
+            text="You released " + pokemon_name + " from your Pokédex."
+        )
+    else:
+        client.answer_callback_query(
+            callback_query_id=callback_query.id,
+            text="You don't have " + pokemon_name + " in your Pokédex."
+        )
+
 
 #-----------------------
 @app.on_message(filters.command("guess"))
