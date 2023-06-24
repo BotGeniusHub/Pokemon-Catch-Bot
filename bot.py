@@ -743,7 +743,6 @@ def help_command(client, message):
        
         keyboard = InlineKeyboardMarkup(
         [
-            [
                 InlineKeyboardButton("Join Support Group", url="https://t.me/BotXDevelopments"),
         ]
         )
