@@ -14,6 +14,13 @@ client = MongoClient('mongodb+srv://jarvis:op@cluster0.7tisvwv.mongodb.net/?retr
 db = client['pokemon_bot']
 collection = db['pokedex']
 
+# Create a Pyrogram client
+api_id = 16743442
+api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
+bot_token = '5827224610:AAGftR84QtQ6rMr7_r2a7zPPjg1SrG755yA'
+app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
+
+
 # Database of available Pokémon, you can add more Pokemon with this format
 pokemon_database = [
     {"name": "Bulbasaur", "catch_rate": 45},
