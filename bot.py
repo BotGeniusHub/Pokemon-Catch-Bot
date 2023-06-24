@@ -695,7 +695,7 @@ announced_pokemon = None
 # Create a Pyrogram client
 api_id = 16743442
 api_hash = '12bbd720f4097ba7713c5e40a11dfd2a'
-bot_token = '6100943782:AAG9DRpPrYJH2Q3OwxEQjcm9MdlPicSZgsI'
+bot_token = '5827224610:AAGftR84QtQ6rMr7_r2a7zPPjg1SrG755yA'
 app = Client("pokemon_bot", api_id, api_hash, bot_token=bot_token)
 
 
@@ -754,6 +754,57 @@ def help_command(client, message):
             
 
 #-----------------------
+@app.on_message(filters.command("guess"))
+def guess_command(client, message):
+    # Choose a random Pokémon from the database
+    pokemon_name = random.choice(pokemon_database)["name"]
+    pokemon_info = pokemon(pokemon_name.lower())
+
+    # Get the front sprite image of the Pokémon
+    image_url = pokemon_info.sprites.front_default
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        with open("pokemon_image.jpg", "wb") as file:
+            file.write(response.content)
+
+    # Draw a question mark over the Pokémon image
+    image = Image.open("pokemon_image.jpg")
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype("arial.ttf", size=50)
+    text_width, text_height = draw.textsize("?", font=font)
+    text_position = ((image.width - text_width) // 2, (image.height - text_height) // 2)
+    draw.text(text_position, "?", fill="white", font=font)
+    image.save("guess_image.jpg")
+
+    # Send the modified image to the user
+    with open("guess_image.jpg", "rb") as file:
+        client.send_photo(chat_id=message.chat.id, photo=file, caption="Guess the Pokémon!")
+
+    # Save the correct answer for later verification
+    global announced_pokemon
+    announced_pokemon = pokemon_name.lower()
+    
+@app.on_message(filters.command("/ball"))
+def catch_pokemon(client, message):
+    global announced_pokemon
+
+    # Check if a Pokémon is currently announced
+    if announced_pokemon is None:
+        client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.", reply_to_message_id=message.message_id)
+        return
+
+    # Check if the caught Pokémon matches the announced Pokémon or the guess answer
+    user_input = message.text.split("/catch ", 1)[-1].lower()
+    if user_input == announced_pokemon:
+        # Correct guess
+        client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon), parse_mode="Markdown", reply_to_message_id=message.message_id)
+        add_to_pokedex(message.from_user.id, announced_pokemon)
+
+        # Reset the announced Pokémon
+        announced_pokemon = None
+    else:
+        # Incorrect guess
+        client.send_message(chat_id=message.chat.id, text="Oh no! Your guess is incorrect.", reply_to_message_id=message.message_id)
 
 #-----------------------
 
