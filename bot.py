@@ -793,15 +793,14 @@ def catch_pokemon(client, message):
     if pokemon_name.lower() == announced_pokemon["name"].lower():
 
         # Check if the Pokémon has already been caught
-    if any(pokemon["name"] == announced_pokemon["name"]) for pokemon in caught_pokemon:
-    client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
-    return
-
+        if any(pokemon["name"] == announced_pokemon["name"] for pokemon in caught_pokemon):
+            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
+            return
 
         catch_probability = random.random()
 
         if catch_probability <= announced_pokemon["catch_rate"]:
-            client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon["name"], parse_mode="Markdown", reply_to_message_id=message.message_id))
+            client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon["name"]), parse_mode="Markdown", reply_to_message_id=message.message_id)
             add_to_pokedex(user_id, announced_pokemon["name"])
 
             # Add the caught Pokémon and the user who caught it to the dictionary
@@ -810,10 +809,9 @@ def catch_pokemon(client, message):
             # Set announced_pokemon to None to allow the announcement of a new Pokémon
             announced_pokemon = None
         else:
-            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"], reply_to_message_id=message.message_id))
+            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
     else:
         client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name), reply_to_message_id=message.message_id)
-
 
 
 # Handler function for group messages
