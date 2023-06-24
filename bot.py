@@ -742,11 +742,16 @@ def help_command(client, message):
         client.send_photo(chat_id=message.chat.id, photo=image_file, caption=caption, reply_to_message_id=message.message_id)
        
         keyboard = InlineKeyboardMarkup(
-        [
-                InlineKeyboardButton("Join Support Group", url="https://t.me/BotXDevelopments"),
-        ]
+            [
+                [
+                    InlineKeyboardButton("Join Support Group", url="https://t.me/BotXDevelopments"),
+                    InlineKeyboardButton("Channel", url="https://t.me/BotGeniusHub"),
+
+                ]
+            ]
         )
 
+            
 
 #-----------------------
 
