@@ -1,4 +1,4 @@
-pokeimport os
+import os
 import random
 import requests
 from pymongo import MongoClient
