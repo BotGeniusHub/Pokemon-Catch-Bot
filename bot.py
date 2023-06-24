@@ -737,24 +737,6 @@ def start(_, message):
 announced_pokemon = None
 pokedex_data = {}
 
-# Handler function for /gift command
-@app.on_message(filters.command("gift"))
-def gift_pokemon(client, message):
-    global announced_pokemon, user_pokedex  # Declare announced_pokemon and pokedex_data as global variables
-    user_id = message.from_user.id
-    user_input = message.text
-    pokemon_name = user_input.split("/gift ", 1)[-1].lower()
-
-    # Check if the Pokémon is in the user's Pokedex
-    if pokemon_name not in pokedex_data.get(user_id, []):
-        client.send_message(chat_id=message.chat.id, text="You don't have {} in your Pokedex.".format(pokemon_name), reply_to_message_id=message.message_id)
-        return
-
-    # Set the announced_pokemon to the chosen Pokémon
-    announced_pokemon = pokemon_name
-
-    client.send_message(chat_id=message.chat.id, text="Reply to the user you want to gift {}.".format(pokemon_name), reply_to_message_id=message.message_id)
-
 # Handler function for user replies
 @app.on_message(filters.reply & ~filters.me)
 def gift_pokemon_reply(client, message):
