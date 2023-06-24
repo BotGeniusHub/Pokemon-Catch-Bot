@@ -793,9 +793,10 @@ def catch_pokemon(client, message):
     if pokemon_name.lower() == announced_pokemon["name"].lower():
 
         # Check if the Pokémon has already been caught
-        if announced_pokemon["name"] in caught_pokemon:
-            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"], reply_to_message_id=message.message_id))
-            return
+    if any(pokemon["name"] == announced_pokemon["name"] for pokemon in caught_pokemon):
+    client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
+    return
+
 
         catch_probability = random.random()
 
