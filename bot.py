@@ -278,8 +278,8 @@ def handle_callback_query(client, callback_query):
                 pokedex_list += "{}. {}\n".format(i, pokemon_name)
 
             caption = "** [{}](tg://user?id={}) 's Pokedex (Page {}/{}) **\n{}\n*Total Pokémon Caught:* {}".format(
-                user.first_name,
-                user.id,
+                message.from_user.first_name,
+                message.from_user.id,
                 prev_page,
                 total_pages,
                 pokedex_list,
