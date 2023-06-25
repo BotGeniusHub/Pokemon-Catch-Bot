@@ -70,22 +70,22 @@ def help_command(client, message):
 #-----------------------
 
 def update_leaderboard(client, chat_id):
-    leaderboard = {}
+    pokedex = {}
 
     # Iterate over the entries in the database
     for entry in db:
         user_id = entry["user_id"]
         caught_count = entry["caught_count"]
-        leaderboard[user_id] = caught_count
+        pokedex[user_id] = caught_count
 
     # Sort the leaderboard based on the caught count in descending order
-    sorted_leaderboard = sorted(leaderboard.items(), key=lambda x: x[1], reverse=True)
+    sorted_leaderboard = sorted(pokedex.items(), key=lambda x: x[1], reverse=True)
 
     # Prepare the message to be sent
     message = "<b>Leaderboard:</b>\n\n"
     message += "Top 10 Pokemon Catchers:\n"
     count = 1
-    for user_id, caught_count in sorted_leaderboard[:10]:
+    for user_id, caught_count in sorted_pokedex[:10]:
         try:
             # Get the user's information
             user = client.get_chat_member(chat_id, user_id)
@@ -101,7 +101,7 @@ def update_leaderboard(client, chat_id):
 
 # Command handler for the /leaderboard command
 @app.on_message(filters.command("leaderboard"))
-def show_leaderboard(client, message):
+def update_leaderboard(client, message):
     leaderboard = update_leaderboard(client, message.chat.id)
     client.send_message(chat_id=message.chat.id, text=leaderboard, reply_to_message_id=message.message_id)
 
