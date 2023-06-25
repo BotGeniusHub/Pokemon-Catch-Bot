@@ -343,25 +343,29 @@ def catch_pokemon(client, message):
 
 # Handler function for group messages
 @app.on_message(filters.group)
-def announce_pokemon(client, message):
-    global announced_pokemon  # Declare announced_pokemon as a global variable
-    pokemon = random.choice(pokemon_database)
-    announced_pokemon = {"name": pokemon["name"], "catch_rate": pokemon["catch_rate"]}
-    pokemon_data = pokemon(announced_pokemon["name"].lower())
-    pokemon_image_url = pokemon_data.sprites.front_default
+def group_message(client, message):
+    global message_count, announced_pokemon
 
-    # Download the Pokémon image
-    image_response = requests.get(pokemon_image_url)
-    image_file_name = f"{announced_pokemon['name']}.png"
-    with open(image_file_name, 'wb') as image_file:
-        image_file.write(image_response.content)
+    message_count += 1
 
-    # Send the Pokémon image and announcement message
-    client.send_photo(message.chat.id, photo=image_file_name, caption="A wild {} appeared! Type '/catch {}' to catch it.".format(announced_pokemon["name"], announced_pokemon["name"]), reply_to_message_id=message.message_id)
+    if message_count % 5 == 0:
+        announced_pokemon = random.choice(pokemon_database)
+        selected_pokemon_data = pokemon(announced_pokemon["name"].lower())
+        pokemon_image_url = selected_pokemon_data.sprites.front_default
 
-    # Remove the downloaded image file
-    image_file.close()
-    os.remove(image_file_name)
+        # Download the Pokémon image
+        image_response = requests.get(pokemon_image_url)
+        image_file_name = f"{announced_pokemon['name']}.png"
+        with open(image_file_name, 'wb') as image_file:
+            image_file.write(image_response.content)
+
+        # Send the Pokémon image and announcement message
+        client.send_photo(message.chat.id, photo=image_file_name, caption="A wild Pokemon appeared! Type '/catch ```Pokemon Name``` to catch it.".format(announced_pokemon["name"], announced_pokemon["name"]))
+
+        # Remove the downloaded image file
+        image_file.close()
+        os.remove(image_file_name)
+
 
 
 # Function to add a caught Pokémon to the user's Pokedex
