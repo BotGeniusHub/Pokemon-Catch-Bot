@@ -1,6 +1,7 @@
 import os
 import random
 import requests
+import pyrogram
 from pymongo import MongoClient
 from pyrogram import Client, filters, idle
 from pokebase import pokemon
