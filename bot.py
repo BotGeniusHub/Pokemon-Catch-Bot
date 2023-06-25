@@ -71,25 +71,6 @@ def help_command(client, message):
 
 
 #-----------------------
-def update_leaderboard(client, chat_id):
-    leaderboard = leaderboard_collection.find().sort('caught_count', pymongo.DESCENDING).limit(10)
-    message = "<b>Leaderboard:</b>\n\n"
-    message += "Top 10 Pokemon Catchers:\n"
-    count = 1
-    for entry in leaderboard:
-        user_id = entry["user_id"]
-        caught_count = entry["caught_count"]
-        try:
-            # Get the user's information
-            user = client.get_chat_member(chat_id, user_id)
-            username = user.user.username if user.user.username else user.user.first_name
-            message += f"{count}. {username}: {caught_count}\n"
-            count += 1
-        except pyrogram.errors.exceptions.bad_request_400.PeerIdInvalid:
-            continue
-
-    # Send the leaderboard message
-    client.send_message(chat_id, message, parse_mode="html")
 
 #-----------------------
 
@@ -338,8 +319,7 @@ def catch_pokemon(client, message):
     else:
         client.send_message(chat_id=message.chat.id, text="You caught the wrong Pokémon. The announced Pokémon is {}.".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
 
-
-
+pokemon_catchers = {}
 
 # Handler function for group messages
 @app.on_message(filters.group)
@@ -384,7 +364,6 @@ def group_message(client, message):
         client.send_message(message.chat.id, leaderboard_message)
 
 
-
 # Function to add a caught Pokémon to the user's Pokedex
 def add_to_pokedex(user_id, pokemon_name):
     pokedex_data = collection.find_one({"user_id": user_id})
@@ -392,9 +371,10 @@ def add_to_pokedex(user_id, pokemon_name):
         pokedex = pokedex_data['pokedex']
         if pokemon_name not in pokedex:
             pokedex.append(pokemon_name)
-        collection.update_one({"user_id": user_id}, {"$set": {"pokedex": pokedex}})
+            collection.update_one({"user_id": user_id}, {"$set": {"pokedex": pokedex}})
     else:
         collection.insert_one({"user_id": user_id, "pokedex": [pokemon_name]})
+
 
             
 # Start the bot
