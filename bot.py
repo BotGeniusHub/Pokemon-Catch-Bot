@@ -344,11 +344,11 @@ def catch_pokemon(client, message):
 # Handler function for group messages
 @app.on_message(filters.group)
 def group_message(client, message):
-    global message_count, announced_pokemon
+    global message_count, pokemon_catchers
 
     message_count += 1
 
-    if message_count % 5 == 0:
+    if message_count % 100 == 0:
         announced_pokemon = random.choice(pokemon_database)
         selected_pokemon_data = pokemon(announced_pokemon["name"].lower())
         pokemon_image_url = selected_pokemon_data.sprites.front_default
@@ -365,6 +365,23 @@ def group_message(client, message):
         # Remove the downloaded image file
         image_file.close()
         os.remove(image_file_name)
+
+        # Update the catch count for the user
+        user_id = message.from_user.id
+        if user_id not in pokemon_catchers:
+            pokemon_catchers[user_id] = 0
+        pokemon_catchers[user_id] += 1
+
+        # Get the top 10 Pokemon catchers
+        top_catchers = sorted(pokemon_catchers.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        leaderboard_message = "Top 10 Pokemon Catchers:\n\n"
+        for index, (user_id, catch_count) in enumerate(top_catchers, start=1):
+            user = client.get_users(user_id)
+            leaderboard_message += f"{index}. {user.first_name}: {catch_count} catches\n"
+
+        # Send the leaderboard message
+        client.send_message(message.chat.id, leaderboard_message)
 
 
 
