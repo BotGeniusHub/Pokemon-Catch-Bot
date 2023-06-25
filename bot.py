@@ -346,11 +346,7 @@ def group_message(client, message):
         image_file.close()
         os.remove(image_file_name)
 
-        # Update the catch count for the user
-        user_id = message.from_user.id
-        if user_id not in pokemon_catchers:
-            pokemon_catchers[user_id] = 0
-        pokemon_catchers[user_id] += 1
+    
 
         # Handler function for the leaderboard command
 @app.on_message(filters.command(["leaderboard"]))
