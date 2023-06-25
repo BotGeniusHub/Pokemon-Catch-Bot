@@ -328,7 +328,7 @@ def group_message(client, message):
 
     message_count += 1
 
-    if message_count % 100 == 0:
+    if message_count % 10 == 0:
         announced_pokemon = random.choice(pokemon_database)
         selected_pokemon_data = pokemon(announced_pokemon["name"].lower())
         pokemon_image_url = selected_pokemon_data.sprites.front_default
