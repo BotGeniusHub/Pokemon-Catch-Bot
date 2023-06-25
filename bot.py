@@ -228,7 +228,7 @@ def handle_callback_query(client, callback_query):
                 [
                     [
                         InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {prev_page - 1}"),
-                        InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {prev_page + 1}"),                                                                                         _page + 1}")
+                        InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {prev_page + 1}")                                                                                         _page + 1}")
                     ]
                 ]
             )
