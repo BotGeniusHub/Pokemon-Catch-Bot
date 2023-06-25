@@ -81,13 +81,18 @@ def update_leaderboard(client, chat_id):
     rank = 1
     for catcher in top_catchers:
         user_id = catcher["_id"]
-        user = client.get_chat_member(chat_id, user_id)
-        username = user.user.username if user.user.username else user.user.first_name
-        count = catcher["count"]
-        leaderboard_text += f"\n{rank}. {username}: {count} Pokémon"
-        rank += 1
+        try:
+            user = client.get_chat_member(chat_id, user_id)
+            username = user.user.username if user.user.username else user.user.first_name
+            count = catcher["count"]
+            leaderboard_text += f"\n{rank}. {username}: {count} Pokémon"
+            rank += 1
+        except pyrogram.errors.exceptions.bad_request_400.PeerIdInvalid as e:
+            print(f"Skipping user {user_id}: Peer ID invalid")
+            continue
 
     return leaderboard_text
+
 
 # Command handler for the /leaderboard command
 @app.on_message(filters.command("leaderboard"))
