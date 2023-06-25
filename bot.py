@@ -11,9 +11,11 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import pokemon_database  
 
 # Connect to MongoDB
-client = MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
+client = pymongo.MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
 db = client['pokemon_bot']
 collection = db['pokedex']
+leaderboard_collection = db['leaderboard']
+
 
 # Global variables to track the group message count and the currently announced Pokémon
 message_count = 0
@@ -68,24 +70,14 @@ def help_command(client, message):
 
 
 #-----------------------
-
 def update_leaderboard(client, chat_id):
-    pokedex = {}
-
-    # Iterate over the entries in the database
-    for entry in db:
-        user_id = entry["user_id"]
-        caught_count = entry["caught_count"]
-        pokedex[user_id] = caught_count
-
-    # Sort the leaderboard based on the caught count in descending order
-    sorted_pokedex = sorted(pokedex.items(), key=lambda x: x[1], reverse=True)
-
-    # Prepare the message to be sent
+    leaderboard = leaderboard_collection.find().sort('caught_count', pymongo.DESCENDING).limit(10)
     message = "<b>Leaderboard:</b>\n\n"
     message += "Top 10 Pokemon Catchers:\n"
     count = 1
-    for user_id, caught_count in sorted_pokedex[:10]:
+    for entry in leaderboard:
+        user_id = entry["user_id"]
+        caught_count = entry["caught_count"]
         try:
             # Get the user's information
             user = client.get_chat_member(chat_id, user_id)
@@ -97,17 +89,6 @@ def update_leaderboard(client, chat_id):
 
     # Send the leaderboard message
     client.send_message(chat_id, message, parse_mode="html")
-
-
-# Command handler for the /leaderboard command
-@app.on_message(filters.command("leaderboard"))
-def update_leaderboard(client, message):
-    pokedex = update_leaderboard(client, message.chat.id)
-    client.send_message(chat_id=message.chat.id, text=leaderboard, reply_to_message_id=message.message_id)
-
-
-
-
 
 #-----------------------
 
@@ -334,50 +315,53 @@ def catch_pokemon(client, message):
 
         # Check if the Pokémon has already been caught
         if announced_pokemon["name"] in caught_pokemon:
-            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"], reply_to_message_id=message.message_id))
+            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
             return
 
         catch_probability = random.random()
 
         if catch_probability <= announced_pokemon["catch_rate"]:
-            client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon["name"], parse_mode="Markdown", reply_to_message_id=message.message_id))
+            client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon["name"]), parse_mode="Markdown", reply_to_message_id=message.message_id)
             add_to_pokedex(user_id, announced_pokemon["name"])
 
             # Add the caught Pokémon and the user who caught it to the dictionary
             caught_pokemon[announced_pokemon["name"]] = user_id
 
+            # Update the leaderboard
+            update_leaderboard(client, message.chat.id)
+
             # Set announced_pokemon to None to allow the announcement of a new Pokémon
             announced_pokemon = None
         else:
-            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"], reply_to_message_id=message.message_id))
+            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
     else:
-        client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name), reply_to_message_id=message.message_id)
+        client.send_message(chat_id=message.chat.id, text="You caught the wrong Pokémon. The announced Pokémon is {}.".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
+
+
 
 
 # Handler function for group messages
 @app.on_message(filters.group)
-def group_message(client, message):
-    global message_count, announced_pokemon
+def announce_pokemon(client, message):
+    global announced_pokemon  # Declare announced_pokemon as a global variable
+    pokemon = random.choice(pokemon_database)
+    announced_pokemon = {"name": pokemon["name"], "catch_rate": pokemon["catch_rate"]}
+    pokemon_data = pokemon(announced_pokemon["name"].lower())
+    pokemon_image_url = pokemon_data.sprites.front_default
 
-    message_count += 1
+    # Download the Pokémon image
+    image_response = requests.get(pokemon_image_url)
+    image_file_name = f"{announced_pokemon['name']}.png"
+    with open(image_file_name, 'wb') as image_file:
+        image_file.write(image_response.content)
 
-    if message_count % 100 == 0:
-        announced_pokemon = random.choice(pokemon_database)
-        pokemon_data = pokemon(announced_pokemon["name"].lower())
-        pokemon_image_url = pokemon_data.sprites.front_default
+    # Send the Pokémon image and announcement message
+    client.send_photo(message.chat.id, photo=image_file_name, caption="A wild {} appeared! Type '/catch {}' to catch it.".format(announced_pokemon["name"], announced_pokemon["name"]), reply_to_message_id=message.message_id)
 
-        # Download the Pokémon image
-        image_response = requests.get(pokemon_image_url)
-        image_file_name = f"{announced_pokemon['name']}.png"
-        with open(image_file_name, 'wb') as image_file:
-            image_file.write(image_response.content)
+    # Remove the downloaded image file
+    image_file.close()
+    os.remove(image_file_name)
 
-        # Send the Pokémon image and announcement message
-        client.send_photo(message.chat.id, photo=image_file_name, caption="A wild Pokemon appeared! Type '/catch ```Pokemon Name``` to catch it.".format(announced_pokemon["name"], announced_pokemon["name"]))
-
-        # Remove the downloaded image file
-        image_file.close()
-        os.remove(image_file_name)
 
 # Function to add a caught Pokémon to the user's Pokedex
 def add_to_pokedex(user_id, pokemon_name):
