@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from pyrogram import Client, filters, idle
 from pokebase import pokemon
 from uuid import uuid4
+from collections import defaultdict
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import pokemon_database  
 
