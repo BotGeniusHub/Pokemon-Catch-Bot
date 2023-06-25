@@ -352,16 +352,20 @@ def group_message(client, message):
             pokemon_catchers[user_id] = 0
         pokemon_catchers[user_id] += 1
 
-        # Get the top 10 Pokemon catchers
-        top_catchers = sorted(pokemon_catchers.items(), key=lambda x: x[1], reverse=True)[:10]
+        # Handler function for the leaderboard command
+@app.on_message(filters.command(["leaderboard"]))
+def leaderboard_command(client, message):
+    # Get the top 10 Pokemon catchers
+    top_catchers = sorted(pokemon_catchers.items(), key=lambda x: x[1], reverse=True)[:10]
 
-        leaderboard_message = "Top 10 Pokemon Catchers:\n\n"
-        for index, (user_id, catch_count) in enumerate(top_catchers, start=1):
-            user = client.get_users(user_id)
-            leaderboard_message += f"{index}. {user.first_name}: {catch_count} catches\n"
+    leaderboard_message = "Top 10 Pokemon Catchers:\n\n"
+    for index, (user_id, catch_count) in enumerate(top_catchers, start=1):
+        user = client.get_users(user_id)
+        leaderboard_message += f"{index}. {user.first_name}: {catch_count} catches\n"
 
-        # Send the leaderboard message
-        client.send_message(message.chat.id, leaderboard_message)
+    # Send the leaderboard message
+    client.send_message(message.chat.id, leaderboard_message)
+
 
 
 # Function to add a caught Pokémon to the user's Pokedex
