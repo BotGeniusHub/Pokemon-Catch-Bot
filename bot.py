@@ -71,20 +71,34 @@ def help_command(client, message):
 # Store the user IDs and their corresponding caught Pokémon counts
 user_pokemon_counts = defaultdict(int)
 
-# Function to generate the leaderboard
-def generate_leaderboard():
-    sorted_users = sorted(user_pokemon_counts.items(), key=lambda x: x[1], reverse=True)
-    leaderboard_text = "Leaderboard:\n"
-    for index, (user_id, count) in enumerate(sorted_users, start=1):
-        user = app.get_users(user_id)
-        leaderboard_text += f"{index}. {user.first_name} - {count} Pokémon\n"
-    return leaderboard_text
+    # Increment the message count and check if the top catchers need to be sent
+    message_count += 1
+    if message_count >= 10:
+        message_count = 0
+        send_leaderboard(client, message.chat.id)
+
+
+def send_leaderboard(client, chat_id):
+    # Get the top catchers from the database
+    top_catchers = collection.aggregate([{"$group": {"_id": "$user_id", "count": {"$sum": 1}}}, {"$sort": {"count": -1}}, {"$limit": 10}])
+
+    leaderboard_text = "**Top Catchers**\n"
+    rank = 1
+    for catcher in top_catchers:
+        user_id = catcher["_id"]
+        user = client.get_chat_member(chat_id, user_id)
+        username = user.user.username if user.user.username else user.user.first_name
+        count = catcher["count"]
+        leaderboard_text += f"\n{rank}. {username}: {count} Pokémon"
+        rank += 1
+
+    client.send_message(chat_id, leaderboard_text, parse_mode="markdown")
 
 # Command handler for the /leaderboard command
 @app.on_message(filters.command("leaderboard"))
 def show_leaderboard(client, message):
     # Generate the leaderboard text
-    leaderboard = generate_leaderboard()
+    leaderboard = send_leaderboard()
 
     # Send the leaderboard message
     client.send_message(chat_id=message.chat.id, text=leaderboard, reply_to_message_id=message.message_id)
