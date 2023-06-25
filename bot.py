@@ -67,6 +67,30 @@ def help_command(client, message):
 
 #-----------------------
 
+# Store the user IDs and their corresponding caught Pokémon counts
+user_pokemon_counts = defaultdict(int)
+
+# Function to generate the leaderboard
+def generate_leaderboard():
+    sorted_users = sorted(user_pokemon_counts.items(), key=lambda x: x[1], reverse=True)
+    leaderboard_text = "Leaderboard:\n"
+    for index, (user_id, count) in enumerate(sorted_users, start=1):
+        user = app.get_users(user_id)
+        leaderboard_text += f"{index}. {user.first_name} - {count} Pokémon\n"
+    return leaderboard_text
+
+# Command handler for the /leaderboard command
+@app.on_message(filters.command("leaderboard"))
+def show_leaderboard(client, message):
+    # Generate the leaderboard text
+    leaderboard = generate_leaderboard()
+
+    # Send the leaderboard message
+    client.send_message(chat_id=message.chat.id, text=leaderboard, reply_to_message_id=message.message_id)
+
+
+
+
 #-----------------------
 
 # Handler function for /pokedex command
