@@ -227,7 +227,7 @@ def handle_callback_query(client, callback_query):
             keyboard = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {next_page - 1}"),
+                        InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {current_page - 1}"),
                         InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {next_page + 1}")
                     ]
                 ]
