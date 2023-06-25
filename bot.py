@@ -69,30 +69,34 @@ def help_command(client, message):
 
 #-----------------------
 
-# Update the leaderboard and show top 10 Pokémon catchers
 def update_leaderboard(client, chat_id):
-    # Get the top catchers from the database
-    top_catchers = collection.aggregate([
-        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}},
-        {"$sort": {"count": -1}},
-        {"$limit": 10}
-    ])
+    leaderboard = {}
 
-    leaderboard_text = "**Top Pokémon Catchers**\n"
-    rank = 1
-    for catcher in top_catchers:
-        user_id = catcher["_id"]
+    # Iterate over the entries in the database
+    for entry in db:
+        user_id = entry["user_id"]
+        caught_count = entry["caught_count"]
+        leaderboard[user_id] = caught_count
+
+    # Sort the leaderboard based on the caught count in descending order
+    sorted_leaderboard = sorted(leaderboard.items(), key=lambda x: x[1], reverse=True)
+
+    # Prepare the message to be sent
+    message = "<b>Leaderboard:</b>\n\n"
+    message += "Top 10 Pokemon Catchers:\n"
+    count = 1
+    for user_id, caught_count in sorted_leaderboard[:10]:
         try:
+            # Get the user's information
             user = client.get_chat_member(chat_id, user_id)
             username = user.user.username if user.user.username else user.user.first_name
-            count = catcher["count"]
-            leaderboard_text += f"\n{rank}. {username}: {count} Pokémon"
-            rank += 1
-        except pyrogram.errors.exceptions.bad_request_400.PeerIdInvalid as e:
-            print(f"Skipping user {user_id}: Peer ID invalid")
+            message += f"{count}. {username}: {caught_count}\n"
+            count += 1
+        except pyrogram.errors.exceptions.bad_request_400.PeerIdInvalid:
             continue
 
-    return leaderboard_text
+    # Send the leaderboard message
+    client.send_message(chat_id, message, parse_mode="html")
 
 
 # Command handler for the /leaderboard command
