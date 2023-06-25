@@ -79,7 +79,7 @@ def update_leaderboard(client, chat_id):
         pokedex[user_id] = caught_count
 
     # Sort the leaderboard based on the caught count in descending order
-    sorted_leaderboard = sorted(pokedex.items(), key=lambda x: x[1], reverse=True)
+    sorted_pokedex = sorted(pokedex.items(), key=lambda x: x[1], reverse=True)
 
     # Prepare the message to be sent
     message = "<b>Leaderboard:</b>\n\n"
@@ -102,7 +102,7 @@ def update_leaderboard(client, chat_id):
 # Command handler for the /leaderboard command
 @app.on_message(filters.command("leaderboard"))
 def update_leaderboard(client, message):
-    leaderboard = update_leaderboard(client, message.chat.id)
+    pokedex = update_leaderboard(client, message.chat.id)
     client.send_message(chat_id=message.chat.id, text=leaderboard, reply_to_message_id=message.message_id)
 
 
