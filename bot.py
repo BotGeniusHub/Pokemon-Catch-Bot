@@ -11,6 +11,7 @@ from collections import defaultdict
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import pokemon_database  
 from PIL import Image, ImageDraw, ImageFont
+from pokestore import pokemon_store
 
 # Connect to MongoDB
 client = pymongo.MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
@@ -73,12 +74,31 @@ def help_command(client, message):
 
 #-----------------------
 
-
 # Global variables
 announced_pokemon = None
 user_pokedex = []
+user_money = {}
+pokemon_store = []
 
-# ...
+
+# Function to generate a random amount of money for the user
+def generate_money():
+    return random.randint(10, 100)  # Generates a random amount between 10 and 100
+
+
+# Function to load the Pokémon store data
+def load_pokemon_store():
+    global pokemon_store
+
+    
+
+# Function to get the current page of the Pokémon store
+def get_store_page(page_number):
+    page_size = 1  # Number of Pokémon per page
+    start_index = (page_number - 1) * page_size
+    end_index = start_index + page_size
+    return pokemon_store[start_index:end_index]
+
 
 @app.on_message(filters.command("guess"))
 def guess_command(client, message):
@@ -141,16 +161,8 @@ def ball_command(client, message):
 
     if pokemon_name == announced_pokemon:
         # Pokémon caught successfully
-
-        # Generate a random gift for the user
-        gift = generate_gift()
-
-        # Add the Pokémon to the user's Pokédex
+        client.send_message(chat_id=message.chat.id, text="Congratulations! You caught the Pokémon!")
         user_pokedex.append(pokemon_name)
-
-        # Send the gift message to the user
-        client.send_message(chat_id=message.chat.id, text="Congratulations! You caught the Pokémon and received a gift: {}".format(gift))
-
     else:
         # Incorrect Pokémon name
         client.send_message(chat_id=message.chat.id, text="Oops! That's not the correct Pokémon.")
@@ -159,9 +171,65 @@ def ball_command(client, message):
     announced_pokemon = None
 
 
-def generate_gift():
-    gifts = ["Money", "Rare Item", "Special Power", "Boosted Experience"]
-    return random.choice(gifts)
+@app.on_message(filters.command("store"))
+def store_command(client, message):
+    global user_money
+
+    page_number = 1  # Default page number
+    command_parts = message.text.split(" ")
+    if len(command_parts) > 1:
+        try:
+            page_number = int(command_parts[1])
+        except ValueError:
+            pass
+
+    load_pokemon_store()
+    store_page = get_store_page(page_number)
+
+    if len(store_page) == 0:
+        client.send_message(chat_id=message.chat.id, text="Invalid page number.")
+        return
+
+    # Build the inline keyboard for navigation
+    inline_keyboard = []
+    if page_number > 1:
+        inline_keyboard.append(InlineKeyboardButton("Previous", callback_data="store_previous"))
+    if len(pokemon_store) > page_number * 1:
+        inline_keyboard.append(InlineKeyboardButton("Next", callback_data="store_next"))
+    markup = InlineKeyboardMarkup([inline_keyboard])
+
+    # Send the Pokémon image and store information to the user
+    for pokemon_data in store_page:
+        image_url = pokemon_data["image"]
+        response = requests.get(image_url)
+        if response.status_code == 200:
+            with open("pokemon_image.jpg", "wb") as file:
+                file.write(response.content)
+
+        with open("pokemon_image.jpg", "rb") as file:
+            client.send_photo(chat_id=message.chat.id, photo=file,
+                              caption="Name: {}\nPrice: {} money".format(pokemon_data["name"], pokemon_data["price"]),
+                              reply_markup=markup)
+
+
+@app.on_callback_query(filters.regex("^store_previous$"))
+def store_previous_callback(client, callback_query):
+    page_number = int(callback_query.message.caption.split("Page: ")[-1])
+    if page_number > 1:
+        page_number -= 1
+        store_command(client, callback_query.message)
+
+
+@app.on_callback_query(filters.regex("^store_next$"))
+def store_next_callback(client, callback_query):
+    page_number = int(callback_query.message.caption.split("Page: ")[-1])
+    page_number += 1
+    store_command(client, callback_query.message)
+
+
+@app.on_message(filters.command("bank"))
+def bank_command(client, message):
+    global user_money
 
 
 
