@@ -299,13 +299,6 @@ def callback_query(client, callback_query):
         store_command(client, callback_query.message)
 
 
-# Start the bot
-bot.run()
-
-
-
-
-
 #-----------------------
 
 # Handler function for /pokedex command
