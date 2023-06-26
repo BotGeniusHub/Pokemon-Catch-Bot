@@ -219,71 +219,89 @@ def bank_command(client, message):
         )
 
 
+# Global variables
+pokemon_store = []
+current_page = 0
+items_per_page = 3
+
+# Handler function for /store command
 @app.on_message(filters.command("store"))
 def store_command(client, message):
-    global user_money
+    global current_page
 
-    page_number = 1  # Default page number
-    command_parts = message.text.split(" ")
-    if len(command_parts) > 1:
-        try:
-            page_number = int(command_parts[1])
-        except ValueError:
-            pass
-
-    load_pokemon_store()
-    store_page = get_store_page(page_number)
-
-    if len(store_page) == 0:
-        client.send_message(chat_id=message.chat.id, text="Invalid page number.")
+    # Check if there are any Pokémon in the store
+    if not pokemon_store:
+        client.send_message(
+            chat_id=message.chat.id,
+            text="The store is currently empty. Please check back later."
+        )
         return
 
-    # Build the inline keyboard for navigation
-    inline_keyboard = []
-    if page_number > 1:
-        inline_keyboard.append(InlineKeyboardButton("Previous", callback_data="store_previous"))
-    if len(pokemon_store) > page_number * 1:
-        inline_keyboard.append(InlineKeyboardButton("Next", callback_data="store_next"))
-    markup = InlineKeyboardMarkup([inline_keyboard])
+    # Calculate the start and end index for the current page
+    start_index = current_page * items_per_page
+    end_index = start_index + items_per_page
 
-    # Send the Pokémon image and store information to the user
-    for pokemon_data in store_page:
-        image_url = pokemon_data["image"]
-        response = requests.get(image_url)
-        if response.status_code == 200:
-            with open("pokemon_image.jpg", "wb") as file:
-                file.write(response.content)
+    # Get the Pokémon for the current page
+    current_pokemon = pokemon_store[start_index:end_index]
 
-        with open("pokemon_image.jpg", "rb") as file:
-            client.send_photo(chat_id=message.chat.id, photo=file,
-                              caption="Name: {}\nPrice: {} money".format(pokemon_data["name"], pokemon_data["price"]),
-                              reply_markup=markup)
+    # Generate inline keyboard buttons for each Pokémon
+    buttons = []
+    for pokemon in current_pokemon:
+        buttons.append(
+            [InlineKeyboardButton(pokemon["name"], callback_data=f"buy_{pokemon['name']}")]
+        )
+
+    # Add next and previous buttons
+    if current_page > 0:
+        buttons.append(
+            [InlineKeyboardButton("Previous", callback_data="previous")]
+        )
+    if end_index < len(pokemon_store):
+        buttons.append(
+            [InlineKeyboardButton("Next", callback_data="next")]
+        )
+
+    # Create inline keyboard markup
+    reply_markup = InlineKeyboardMarkup(buttons)
+
+    # Send the store message with the current Pokémon and buttons
+    client.send_message(
+        chat_id=message.chat.id,
+        text="Welcome to the Pokémon Store! Here are the available Pokémon:",
+        reply_markup=reply_markup
+    )
 
 
-@app.on_callback_query(filters.regex("^store_previous$"))
-def store_previous_callback(client, callback_query):
-    page_number = int(callback_query.message.caption.split("Page: ")[-1])
-    if page_number > 1:
-        page_number -= 1
+# Handler function for callback queries
+@app.on_callback_query()
+def callback_query(client, callback_query):
+    global current_page
+
+    # Get the callback data
+    callback_data = callback_query.data
+
+    # Check if it's a buy action
+    if callback_data.startswith("buy_"):
+        pokemon_name = callback_data.replace("buy_", "")
+        # Replace with your logic for purchasing the Pokémon
+        # Here, you can deduct the price from the user's bank account, add the Pokémon to their collection, etc.
+        client.send_message(
+            chat_id=callback_query.message.chat.id,
+            text=f"You have purchased {pokemon_name}!"
+        )
+    elif callback_data == "previous":
+        # Move to the previous page
+        current_page -= 1
+        store_command(client, callback_query.message)
+    elif callback_data == "next":
+        # Move to the next page
+        current_page += 1
         store_command(client, callback_query.message)
 
 
-@app.on_callback_query(filters.regex("^store_next$"))
-def store_next_callback(client, callback_query):
-    page_number = int(callback_query.message.caption.split("Page: ")[-1])
-    page_number += 1
-    store_command(client, callback_query.message)
+# Start the bot
+bot.run()
 
-
-@app.on_message(filters.command("bank"))
-def bank_command(client, message):
-    global user_money
-
-    if message.from_user.id not in user_money:
-        user_money[message.from_user.id] = generate_money()
-
-    money_amount = user_money[message.from_user.id]
-    client.send_message(chat_id=message.chat.id, text="Your current balance is {} money.".format(money_amount))
 
 
 
