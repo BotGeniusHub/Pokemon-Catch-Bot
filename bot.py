@@ -231,6 +231,13 @@ def store_next_callback(client, callback_query):
 def bank_command(client, message):
     global user_money
 
+    if message.from_user.id not in user_money:
+        user_money[message.from_user.id] = generate_money()
+
+    money_amount = user_money[message.from_user.id]
+    client.send_message(chat_id=message.chat.id, text="Your current balance is {} money.".format(money_amount))
+
+
 
 
 #-----------------------
