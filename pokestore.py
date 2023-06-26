@@ -9,7 +9,7 @@
     #   ...
     # ]
 
-    pokemon_store = [
+pokemon_store = [
         {"name": "charmander", "image": "charmander_image_url", "price": 50},
         {"name": "bulbasaur", "image": "bulbasaur_image_url", "price": 60},
         {"name": "squirtle", "image": "squirtle_image_url", "price": 70},
