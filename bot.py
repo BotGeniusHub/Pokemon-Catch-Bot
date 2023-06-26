@@ -362,6 +362,13 @@ def catch_pokemon(client, message):
         client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name), reply_to_message_id=message.message_id)
 
 
+# PokéAPI base URL
+POKEAPI_BASE_URL = 'https://pokeapi.co/api/v2'
+
+# Global variables
+message_count = 0
+announced_pokemon = None
+
 # Handler function for group messages
 @app.on_message(filters.group)
 def group_message(client, message):
@@ -369,26 +376,31 @@ def group_message(client, message):
 
     message_count += 1
 
-    if message_count % 10 == 0:
+    if message_count % 100 == 0:
         announced_pokemon = random.choice(pokemon_database)
         pokemon_data = pokemon(announced_pokemon["name"].lower())
+        pokemon_species_url = f'{POKEAPI_BASE_URL}/pokemon-species/{pokemon_data.id}'
+        
+        # Fetch Pokémon species data
+        species_response = requests.get(pokemon_species_url)
+        species_data = species_response.json()
+        
+        # Fetch Pokémon sprite URL
+        pokemon_sprite_url = species_data['sprites']['other']['official-artwork']['front_default']
 
-        image_url = pokemon_data.sprites.other["official-artwork"].front_default
-        response = requests.get(image_url)
-        if response.status_code == 200:
-            with open("pokemon_image.jpg", "wb") as file:
-                file.write(response.content)
+        # Download the Pokémon image
+        image_response = requests.get(pokemon_sprite_url)
+        image_file_name = f"{announced_pokemon['name']}.png"
+        with open(image_file_name, 'wb') as image_file:
+            image_file.write(image_response.content)
 
-        caption = f"A wild {announced_pokemon['name']} appeared! Type /catch {announced_pokemon['name']} to catch it."
+        # Send the Pokémon image and announcement message
+        client.send_photo(message.chat.id, photo=image_file_name, caption=f"A wild {announced_pokemon['name']} appeared! Type /catch {announced_pokemon['name']} to catch it.")
 
-        client.send_photo(
-            chat_id=message.chat.id,
-            photo="pokemon_image.jpg",
-            caption=caption,
-            reply_to_message_id=message.message_id
-        )
+        # Remove the downloaded image file
+        image_file.close()
+        os.remove(image_file_name)
 
-        os.remove("pokemon_image.jpg")
 
 
 
