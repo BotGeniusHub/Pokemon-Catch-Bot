@@ -386,7 +386,7 @@ def group_message(client, message):
         species_data = species_response.json()
         
         # Fetch Pokémon sprite URL
-        pokemon_sprite_url = species_data['varieties'][0]['pokemon']['sprites']['other']['official-artwork']['front_default']
+        pokemon_sprite_url = species_data['varieties'][0]['pokemon']['other']['official-artwork']['front_default']
 
         # Download the Pokémon image
         image_response = requests.get(pokemon_sprite_url)
