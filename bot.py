@@ -10,6 +10,7 @@ from uuid import uuid4
 from collections import defaultdict
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database import pokemon_database  
+from PIL import Image, ImageDraw, ImageFont
 
 # Connect to MongoDB
 client = pymongo.MongoClient('mongodb+srv://sonu55:sonu55@cluster0.vqztrvk.mongodb.net/?retryWrites=true&w=majority')
@@ -71,6 +72,98 @@ def help_command(client, message):
 
 
 #-----------------------
+
+
+# Global variables
+announced_pokemon = None
+user_pokedex = []
+
+# ...
+
+@app.on_message(filters.command("guess"))
+def guess_command(client, message):
+    global announced_pokemon
+
+    if announced_pokemon:
+        client.send_message(
+            chat_id=message.chat.id,
+            text="There is already an ongoing guess. Type /ball to catch it!"
+        )
+        return
+
+    # Choose a random Pokémon from the database
+    pokemon_name = random.choice(pokemon_database)["name"]
+    pokemon_info = pokemon(pokemon_name.lower())
+
+    # Get the front sprite image of the Pokémon
+    image_url = pokemon_info.sprites.front_default
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        with open("pokemon_image.jpg", "wb") as file:
+            file.write(response.content)
+
+    # Draw a question mark over the Pokémon image
+    image = Image.open("pokemon_image.jpg")
+    image = image.convert("RGB")  # Convert to RGB mode
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype("arial.ttf", size=50)
+    text_width, text_height = draw.textsize("?", font=font)
+    text_position = ((image.width - text_width) // 2, (image.height - text_height) // 2)
+    draw.text(text_position, "?", fill="white", font=font)
+    image.save("guess_image.jpg", "JPEG")  # Save as JPEG
+
+    # Send the modified image to the user
+    with open("guess_image.jpg", "rb") as file:
+        client.send_photo(chat_id=message.chat.id, photo=file, caption="Guess the Pokémon!")
+
+    # Save the correct answer for later verification
+    announced_pokemon = pokemon_name.lower()
+
+
+@app.on_message(filters.command("ball"))
+def ball_command(client, message):
+    global announced_pokemon, user_pokedex
+
+    if not announced_pokemon:
+        client.send_message(
+            chat_id=message.chat.id,
+            text="No Pokémon to catch. Type /guess to start a new guessing game."
+        )
+        return
+
+    # Get the Pokémon name provided by the user
+    command_parts = message.text.split(" ")
+    if len(command_parts) < 2:
+        client.send_message(chat_id=message.chat.id, text="Please provide a Pokémon name.")
+        return
+
+    pokemon_name = command_parts[1].lower()
+
+    if pokemon_name == announced_pokemon:
+        # Pokémon caught successfully
+
+        # Generate a random gift for the user
+        gift = generate_gift()
+
+        # Add the Pokémon to the user's Pokédex
+        user_pokedex.append(pokemon_name)
+
+        # Send the gift message to the user
+        client.send_message(chat_id=message.chat.id, text="Congratulations! You caught the Pokémon and received a gift: {}".format(gift))
+
+    else:
+        # Incorrect Pokémon name
+        client.send_message(chat_id=message.chat.id, text="Oops! That's not the correct Pokémon.")
+
+    # Reset the announced Pokémon
+    announced_pokemon = None
+
+
+def generate_gift():
+    gifts = ["Money", "Rare Item", "Special Power", "Boosted Experience"]
+    return random.choice(gifts)
+
+
 
 #-----------------------
 
