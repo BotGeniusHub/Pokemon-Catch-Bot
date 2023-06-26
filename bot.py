@@ -121,8 +121,8 @@ def view_pokedex(client, message):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {current_page - 1}"),
-                    InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {current_page + 1}")
+                    InlineKeyboardButton("◀️", callback_data=f"prev_pokedex_page {current_page - 1}"),
+                    InlineKeyboardButton("▶️", callback_data=f"next_pokedex_page {current_page + 1}")
                 ]
             ]
         )
@@ -191,8 +191,8 @@ def handle_callback_query(client, callback_query):
             keyboard = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {next_page - 1}"),
-                        InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {next_page + 1}")
+                        InlineKeyboardButton("◀️", callback_data=f"prev_pokedex_page {next_page - 1}"),
+                        InlineKeyboardButton("▶️", callback_data=f"next_pokedex_page {next_page + 1}")
                     ]
                 ]
             )
@@ -253,8 +253,8 @@ def handle_callback_query(client, callback_query):
             keyboard = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("Previous Page", callback_data=f"prev_pokedex_page {prev_page - 1}"),
-                        InlineKeyboardButton("Next Page", callback_data=f"next_pokedex_page {prev_page + 1}")
+                        InlineKeyboardButton("◀️", callback_data=f"prev_pokedex_page {prev_page - 1}"),
+                        InlineKeyboardButton("▶️", callback_data=f"next_pokedex_page {prev_page + 1}")
                     ]
                 ]
             )
@@ -320,19 +320,59 @@ def catch_pokemon(client, message):
     else:
         client.send_message(chat_id=message.chat.id, text="You caught the wrong Pokémon. The announced Pokémon is {}.".format(announced_pokemon["name"]), reply_to_message_id=message.message_id)
 
-pokemon_catchers = {}
+# Global variables to track the announced Pokémon and caught Pokémon
+announced_pokemon = None
+caught_pokemon = {}
+
+# Handler function for /catch command
+@app.on_message(filters.command("catch"))
+def catch_pokemon(client, message):
+    global announced_pokemon  # Declare announced_pokemon as a global variable
+    user_id = message.from_user.id
+    user_input = message.text
+    pokemon_name = user_input.split("/catch ", 1)[-1].lower()
+
+    # Check if a Pokémon is currently announced
+    if announced_pokemon is None:
+        client.send_message(chat_id=message.chat.id, text="No Pokémon is currently announced.", reply_to_message_id=message.message_id)
+        return
+
+    # Check if the caught Pokémon matches the announced Pokémon
+    if pokemon_name.lower() == announced_pokemon["name"].lower():
+
+        # Check if the Pokémon has already been caught
+        if announced_pokemon["name"] in caught_pokemon:
+            client.send_message(chat_id=message.chat.id, text="{} has already been caught.".format(announced_pokemon["name"], reply_to_message_id=message.message_id))
+            return
+
+        catch_probability = random.random()
+
+        if catch_probability <= announced_pokemon["catch_rate"]:
+            client.send_message(chat_id=message.chat.id, text="Congratulations [{}](tg://user?id={})! You caught {}!".format(message.from_user.first_name, message.from_user.id, announced_pokemon["name"], parse_mode="Markdown", reply_to_message_id=message.message_id))
+            add_to_pokedex(user_id, announced_pokemon["name"])
+
+            # Add the caught Pokémon and the user who caught it to the dictionary
+            caught_pokemon[announced_pokemon["name"]] = user_id
+
+            # Set announced_pokemon to None to allow the announcement of a new Pokémon
+            announced_pokemon = None
+        else:
+            client.send_message(chat_id=message.chat.id, text="Oh no! {} escaped!".format(announced_pokemon["name"], reply_to_message_id=message.message_id))
+    else:
+        client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name), reply_to_message_id=message.message_id)
+
 
 # Handler function for group messages
 @app.on_message(filters.group)
 def group_message(client, message):
-    global message_count, pokemon_catchers
+    global message_count, announced_pokemon
 
     message_count += 1
 
-    if message_count % 10 == 0:
+    if message_count % 100 == 0:
         announced_pokemon = random.choice(pokemon_database)
-        selected_pokemon_data = pokemon(announced_pokemon["name"].lower())
-        pokemon_image_url = selected_pokemon_data.sprites.front_default
+        pokemon_data = pokemon(announced_pokemon["name"].lower())
+        pokemon_image_url = pokemon_data.sprites.front_default
 
         # Download the Pokémon image
         image_response = requests.get(pokemon_image_url)
@@ -341,29 +381,11 @@ def group_message(client, message):
             image_file.write(image_response.content)
 
         # Send the Pokémon image and announcement message
-        client.send_photo(message.chat.id, photo=image_file_name, caption="A wild Pokemon appeared! Type '/catch ```Pokemon Name``` to catch it.".format(announced_pokemon["name"], announced_pokemon["name"]))
+        client.send_photo(message.chat.id, photo=image_file_name, caption="A wild Pokemon appeared! Type /catch ```Name``` to catch it.".format(announced_pokemon["name"], announced_pokemon["name"]))
 
         # Remove the downloaded image file
         image_file.close()
         os.remove(image_file_name)
-
-    
-
-        # Handler function for the leaderboard command
-@app.on_message(filters.command(["leaderboard"]))
-def leaderboard_command(client, message):
-    # Get the top 10 Pokemon catchers
-    top_catchers = sorted(pokemon_catchers.items(), key=lambda x: x[1], reverse=True)[:10]
-
-    leaderboard_message = "Top 10 Pokemon Catchers:\n\n"
-    for index, (user_id, catch_count) in enumerate(top_catchers, start=1):
-        user = client.get_users(user_id)
-        leaderboard_message += f"{index}. {user.first_name}: {catch_count} catches\n"
-
-    # Send the leaderboard message
-    client.send_message(message.chat.id, leaderboard_message)
-
-
 
 # Function to add a caught Pokémon to the user's Pokedex
 def add_to_pokedex(user_id, pokemon_name):
@@ -372,10 +394,9 @@ def add_to_pokedex(user_id, pokemon_name):
         pokedex = pokedex_data['pokedex']
         if pokemon_name not in pokedex:
             pokedex.append(pokemon_name)
-            collection.update_one({"user_id": user_id}, {"$set": {"pokedex": pokedex}})
+        collection.update_one({"user_id": user_id}, {"$set": {"pokedex": pokedex}})
     else:
         collection.insert_one({"user_id": user_id, "pokedex": [pokemon_name]})
-
 
             
 # Start the bot
