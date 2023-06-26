@@ -140,10 +140,20 @@ def guess_command(client, message):
     announced_pokemon = pokemon_name.lower()
 
 
+
+
+# Global variables
+announced_pokemon = None
+user_pokedex = []
+user_bank = {}
+
+# ...
+
 @app.on_message(filters.command("ball"))
 def ball_command(client, message):
-    global announced_pokemon, user_pokedex
+    global announced_pokemon
 
+    # Check if there is a Pokémon to catch
     if not announced_pokemon:
         client.send_message(
             chat_id=message.chat.id,
@@ -154,21 +164,59 @@ def ball_command(client, message):
     # Get the Pokémon name provided by the user
     command_parts = message.text.split(" ")
     if len(command_parts) < 2:
-        client.send_message(chat_id=message.chat.id, text="Please provide a Pokémon name.")
+        client.send_message(
+            chat_id=message.chat.id,
+            text="Please provide a Pokémon name."
+        )
         return
 
     pokemon_name = command_parts[1].lower()
 
     if pokemon_name == announced_pokemon:
         # Pokémon caught successfully
-        client.send_message(chat_id=message.chat.id, text="Congratulations! You caught the Pokémon!")
+        client.send_message(
+            chat_id=message.chat.id,
+            text="Congratulations! You caught the Pokémon!"
+        )
         user_pokedex.append(pokemon_name)
+
+        # Give a random amount of money to the user
+        money_amount = random.randint(10, 50)
+        user_id = message.from_user.id
+        if user_id in user_bank:
+            user_bank[user_id] += money_amount
+        else:
+            user_bank[user_id] = money_amount
+
+        client.send_message(
+            chat_id=message.chat.id,
+            text="You received {} money!".format(money_amount)
+        )
     else:
         # Incorrect Pokémon name
-        client.send_message(chat_id=message.chat.id, text="Oops! That's not the correct Pokémon.")
+        client.send_message(
+            chat_id=message.chat.id,
+            text="Oops! That's not the correct Pokémon."
+        )
 
     # Reset the announced Pokémon
     announced_pokemon = None
+
+
+@app.on_message(filters.command("bank"))
+def bank_command(client, message):
+    user_id = message.from_user.id
+    if user_id in user_bank:
+        money_amount = user_bank[user_id]
+        client.send_message(
+            chat_id=message.chat.id,
+            text="Your bank account balance is {} money.".format(money_amount)
+        )
+    else:
+        client.send_message(
+            chat_id=message.chat.id,
+            text="You don't have a bank account. Start catching Pokémon to earn money!"
+        )
 
 
 @app.on_message(filters.command("store"))
