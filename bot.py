@@ -373,7 +373,7 @@ def group_message(client, message):
         announced_pokemon = random.choice(pokemon_database)
         pokemon_data = pokemon(announced_pokemon["name"].lower())
 
-        image_url = pokemon_data.sprites.other["official-artwork"]["front_default"]
+        image_url = pokemon_data.sprites.other.official_artwork.front_default
         response = requests.get(image_url)
         if response.status_code == 200:
             with open("pokemon_image.jpg", "wb") as file:
@@ -389,6 +389,7 @@ def group_message(client, message):
         )
 
         os.remove("pokemon_image.jpg")
+
 
 
 # Function to add a caught Pokémon to the user's Pokedex
