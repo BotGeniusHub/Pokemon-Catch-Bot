@@ -376,7 +376,7 @@ def group_message(client, message):
 
     message_count += 1
 
-    if message_count % 100 == 0:
+    if message_count % 10 == 0:
         announced_pokemon = random.choice(pokemon_database)
         pokemon_data = pokemon(announced_pokemon["name"].lower())
         pokemon_species_url = f'{POKEAPI_BASE_URL}/pokemon-species/{pokemon_data.id}'
@@ -386,7 +386,7 @@ def group_message(client, message):
         species_data = species_response.json()
         
         # Fetch Pokémon sprite URL
-        pokemon_sprite_url = species_data['sprites']['other']['official-artwork']['front_default']
+        pokemon_sprite_url = species_data['varieties'][0]['pokemon']['sprites']['other']['official-artwork']['front_default']
 
         # Download the Pokémon image
         image_response = requests.get(pokemon_sprite_url)
@@ -400,6 +400,7 @@ def group_message(client, message):
         # Remove the downloaded image file
         image_file.close()
         os.remove(image_file_name)
+
 
 
 
