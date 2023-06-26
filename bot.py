@@ -362,6 +362,7 @@ def catch_pokemon(client, message):
         client.send_message(chat_id=message.chat.id, text="The announced Pokémon is not {}.".format(pokemon_name), reply_to_message_id=message.message_id)
 
 
+
 # PokéAPI base URL
 POKEAPI_BASE_URL = 'https://pokeapi.co/api/v2'
 
@@ -380,13 +381,13 @@ def group_message(client, message):
         announced_pokemon = random.choice(pokemon_database)
         pokemon_data = pokemon(announced_pokemon["name"].lower())
         pokemon_species_url = f'{POKEAPI_BASE_URL}/pokemon-species/{pokemon_data.id}'
-        
+
         # Fetch Pokémon species data
         species_response = requests.get(pokemon_species_url)
         species_data = species_response.json()
-        
+
         # Fetch Pokémon sprite URL
-        pokemon_sprite_url = species_data['varieties'][0]['pokemon']['other']['official-artwork']['front_default']
+        pokemon_sprite_url = get_sprite_url(species_data)
 
         # Download the Pokémon image
         image_response = requests.get(pokemon_sprite_url)
@@ -401,9 +402,16 @@ def group_message(client, message):
         image_file.close()
         os.remove(image_file_name)
 
-
-
-
+def get_sprite_url(species_data):
+    varieties = species_data['varieties']
+    for variety in varieties:
+        pokemon_data = variety['pokemon']
+        sprites = pokemon_data['sprites']
+        if 'official-artwork' in sprites:
+            return sprites['official-artwork']['front_default']
+        if 'front_default' in sprites:
+            return sprites['front_default']
+    raise ValueError('Unable to fetch Pokémon sprite URL.')
 
 
 # Function to add a caught Pokémon to the user's Pokedex
