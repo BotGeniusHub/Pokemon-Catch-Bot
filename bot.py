@@ -203,26 +203,19 @@ def ball_command(client, message):
     announced_pokemon = None
 
 
-@app.on_message(filters.command("bank"))
-def bank_command(client, message):
-    user_id = message.from_user.id
-    if user_id in user_bank:
-        money_amount = user_bank[user_id]
-        client.send_message(
-            chat_id=message.chat.id,
-            text="Your bank account balance is {} money.".format(money_amount)
-        )
-    else:
-        client.send_message(
-            chat_id=message.chat.id,
-            text="You don't have a bank account. Start catching Pokémon to earn money!"
-        )
 
-
-# Global variables
-pokemon_store = []
 current_page = 0
 items_per_page = 3
+
+# User bank account data structure:
+# {
+#     "user_id": {
+#         "balance": 500,
+#         "pokedex": []
+#     },
+#     ...
+# }
+user_accounts = {}
 
 # Handler function for /store command
 @app.on_message(filters.command("store"))
@@ -280,15 +273,47 @@ def callback_query(client, callback_query):
     # Get the callback data
     callback_data = callback_query.data
 
+    # Get the user's bank account data
+    user_id = callback_query.from_user.id
+    user_account = user_accounts.setdefault(user_id, {"balance": 500, "pokedex": []})
+
     # Check if it's a buy action
     if callback_data.startswith("buy_"):
         pokemon_name = callback_data.replace("buy_", "")
-        # Replace with your logic for purchasing the Pokémon
-        # Here, you can deduct the price from the user's bank account, add the Pokémon to their collection, etc.
-        client.send_message(
-            chat_id=callback_query.message.chat.id,
-            text=f"You have purchased {pokemon_name}!"
-        )
+
+        # Find the selected Pokémon in the store
+        selected_pokemon = None
+        for pokemon in pokemon_store:
+            if pokemon["name"] == pokemon_name:
+                selected_pokemon = pokemon
+                break
+
+        if selected_pokemon:
+            # Check if the user has enough balance
+            if user_account["balance"] >= selected_pokemon["price"]:
+                # Deduct the price from the user's balance
+                user_account["balance"] -= selected_pokemon["price"]
+
+                # Add the Pokémon to the user's collection
+                user_account["pokedex"].append(selected_pokemon["name"])
+
+                # Send the purchase confirmation message
+                client.send_message(
+                    chat_id=callback_query.message.chat.id,
+                    text=f"You have purchased {pokemon_name} for {selected_pokemon['price']} coins!"
+                )
+            else:
+                # Insufficient balance
+                client.send_message(
+                    chat_id=callback_query.message.chat.id,
+                    text="Sorry, you don't have enough coins to purchase this Pokémon."
+                )
+        else:
+            # Invalid Pokémon selection
+            client.send_message(
+                chat_id=callback_query.message.chat.id,
+                text="Invalid Pokémon selection. Please try again."
+            )
     elif callback_data == "previous":
         # Move to the previous page
         current_page -= 1
@@ -297,6 +322,23 @@ def callback_query(client, callback_query):
         # Move to the next page
         current_page += 1
         store_command(client, callback_query.message)
+
+
+# Handler function for /bank command
+@app.on_message(filters.command("bank"))
+def bank_command(client, message):
+    user_id = message.from_user.id
+    user_account = user_accounts.setdefault(user_id, {"balance": 500, "pokedex": []})
+    balance = user_account["balance"]
+
+    # Send the user's bank account balance
+    client.send_message(
+        chat_id=message.chat.id,
+        text=f"Your current balance is {balance} coins."
+    )
+
+
+
 
 
 #-----------------------
