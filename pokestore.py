@@ -16,5 +16,11 @@ pokemon_store = [
         {"name": "pikachu", "image": "pikachu_image_url", "price": 80},
         {"name": "jigglypuff", "image": "jigglypuff_image_url", "price": 90},
         {"name": "eevee", "image": "eevee_image_url", "price": 100},
+        {"name": "charmeleon", "image": "charmeleon_image_url", "price": 70},
+        {"name": "ivysaur", "image": "ivysaur_image_url", "price": 70},
+        {"name": "charizard", "image": "charizard_image_url", "price": 300},
+        {"name": "raichu", "image": "raichu_image_url", "price": 80},
+        {"name": "geodude", "image": "geodude_image_url", "price": 90},
+        {"name": "onix", "image": "onix_image_url", "price": 100},
         # Add more Pokémon entries for additional pages
     ]
