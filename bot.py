@@ -357,7 +357,7 @@ def view_pokedex(client, message):
             client.send_message(message.chat.id, "Your Pokedex is empty.", reply_to_message_id=message.message_id)
             return
 
-        page_size = 10  # Number of Pokémon to display per page
+        page_size = 15  # Number of Pokémon to display per page
         current_page = 1
         total_pages = (total_pokemon - 1) // page_size + 1
 
