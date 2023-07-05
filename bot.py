@@ -226,7 +226,7 @@ def store_command(client, message):
     if not pokemon_store:
         client.send_message(
             chat_id=message.chat.id,
-            text="The store is currently empty. Please check back later."
+            text="Coming Soon..."
         )
         return
 
@@ -390,8 +390,8 @@ def view_pokedex(client, message):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("◀️", callback_data=f"prev_pokedex_page {current_page - 1}"),
-                    InlineKeyboardButton("▶️", callback_data=f"next_pokedex_page {current_page + 1}")
+                    InlineKeyboardButton("Back", callback_data=f"prev_pokedex_page {current_page - 1}"),
+                    InlineKeyboardButton("Next", callback_data=f"next_pokedex_page {current_page + 1}")
                 ]
             ]
         )
@@ -460,8 +460,8 @@ def handle_callback_query(client, callback_query):
             keyboard = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("◀️", callback_data=f"prev_pokedex_page {next_page - 1}"),
-                        InlineKeyboardButton("▶️", callback_data=f"next_pokedex_page {next_page + 1}")
+                        InlineKeyboardButton("Back", callback_data=f"prev_pokedex_page {next_page - 1}"),
+                        InlineKeyboardButton("Next", callback_data=f"next_pokedex_page {next_page + 1}")
                     ]
                 ]
             )
@@ -522,8 +522,8 @@ def handle_callback_query(client, callback_query):
             keyboard = InlineKeyboardMarkup(
                 [
                     [
-                        InlineKeyboardButton("◀️", callback_data=f"prev_pokedex_page {prev_page - 1}"),
-                        InlineKeyboardButton("▶️", callback_data=f"next_pokedex_page {prev_page + 1}")
+                        InlineKeyboardButton("Back", callback_data=f"prev_pokedex_page {prev_page - 1}"),
+                        InlineKeyboardButton("Next", callback_data=f"next_pokedex_page {prev_page + 1}")
                     ]
                 ]
             )
