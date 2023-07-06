@@ -337,6 +337,18 @@ def bank_command(client, message):
         text=f"Your current balance is {balance} coins."
     )
 
+# Command handler for /stats
+@app.on_message(filters.command('stats', prefixes='/'))
+def get_bot_stats(client, message):
+
+    # Get the number of chats the bot is in
+    chat_count = client.get_dialogs_count()
+
+    # Get the number of users the bot can see
+    user_count = client.get_users_count()
+
+    # Send the stats as a reply to the command message
+    message.reply_text(f"Chats: {chat_count}\nUsers: {user_count}")
 
 
 
